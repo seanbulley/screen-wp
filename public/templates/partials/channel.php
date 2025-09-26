@@ -10,16 +10,16 @@
 
 global $post;
 
-$channel = new Foyer_Channel( get_the_id() );
+$channel = new Recspectra_Channel( get_the_id() );
 ?><div<?php $channel->classes(); ?>>
-	<div class="foyer-slides"><?php
+	<div class="recspectra-slides"><?php
 
 		foreach( $channel->get_slides() as $slide ) {
 
 			$post = get_post( $slide->ID );
 			setup_postdata( $post );
 
-			Foyer_Templates::get_template('partials/slide.php');
+			Recspectra_Templates::get_template('partials/slide.php');
 
 			wp_reset_postdata();
 		}

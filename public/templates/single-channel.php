@@ -10,7 +10,7 @@
 		wp_head( );
 	?></head>
 	<body <?php body_class();?>><?php
-		Foyer_Templates::get_template('partials/channel.php');
+		Recspectra_Templates::get_template('partials/channel.php');
 		wp_footer();
 	?></body>
 </html>

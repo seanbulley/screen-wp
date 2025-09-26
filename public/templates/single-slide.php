@@ -11,7 +11,7 @@
 		wp_head( );
 	?></head>
 	<body <?php body_class();?>><?php
-		Foyer_Templates::get_template('partials/slide.php');
+		Recspectra_Templates::get_template('partials/slide.php');
 		wp_footer();
 	?></body>
 </html>
