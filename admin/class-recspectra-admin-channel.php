@@ -79,8 +79,8 @@ class Recspectra_Admin_Channel {
 		wp_die();
 	}
 
-	/**
-	 * Adds the slides editor meta box to the channel admin page.
+        /**
+         * Adds the content editor meta box to the channel admin page.
 	 *
 	 * @since	1.0.0
 	 * @since	1.3.2	Changed method to static.
@@ -88,7 +88,7 @@ class Recspectra_Admin_Channel {
 	static function add_slides_editor_meta_box() {
 		add_meta_box(
 			'recspectra_slides_editor',
-			_x( 'Slides', 'slide cpt', 'recspectra' ),
+                        _x( 'Content', 'slide cpt', 'recspectra' ),
 			array( __CLASS__, 'slides_editor_meta_box' ),
 			Recspectra_Channel::post_type_name,
 			'normal',
@@ -113,8 +113,8 @@ class Recspectra_Admin_Channel {
 		);
 	}
 
-	/**
-	 * Outputs the Slides Count column.
+        /**
+         * Outputs the Content Count column.
 	 *
 	 * @since	1.0.0
 	 * @since	1.3.2	Changed method to static.

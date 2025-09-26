@@ -1,6 +1,6 @@
 <?php
 /**
- * Preview template for Displays, Channels and Slides.
+ * Preview template for Displays, Channels and Content.
  *
  * @since	1.0.0
  */

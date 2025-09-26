@@ -32,16 +32,16 @@ class Recspectra_Admin_Slide {
 		);
 	}
 
-	/**
-	 * Adds a Slide Format column to the Slides admin table, just after the title column.
-	 *
-	 * @since	1.0.0
-	 * @since	1.3.2	Changed method to static.
-	 * @since	1.5.1	Renamed column from 'Slide format' to 'Slide format, background'.
-	 *
-	 * @param 	array	$columns	The current columns.
-	 * @return	array				The new columns.
-	 */
+        /**
+         * Adds a Slide Format column to the Content admin table, just after the title column.
+         *
+         * @since       1.0.0
+         * @since       1.3.2   Changed method to static.
+         * @since       1.5.1   Renamed column from 'Slide format' to 'Slide format, background'.
+         *
+         * @param       array   $columns        The current columns.
+         * @return      array                           The new columns.
+         */
 	static function add_slide_format_column( $columns ) {
 		$new_columns = array();
 

@@ -9,7 +9,7 @@
 	});
 
 
-	/* Slides editor */
+        /* Content editor */
 
 	function setup_slides_editor_actions() {
 

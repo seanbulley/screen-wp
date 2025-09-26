@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The preview functionality for Displays, Channels and Slides.
+ * The preview functionality for Displays, Channels and Content.
  *
  * @since		1.0.0
  * @since		1.3.2	Refactored class from object to static methods.
@@ -90,7 +90,7 @@ class Recspectra_Admin_Preview {
 	}
 
 	/**
-	 * Hides the admin bar when a Display, Channel of Slides is shown inside a preview iframe.
+        * Hides the admin bar when a Display, Channel or Content item is shown inside a preview iframe.
 	 *
 	 * @since	1.0.0
 	 * @return	bool

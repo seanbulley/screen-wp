@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The class that holds all helper functions for slides.
+ * The class that holds all helper functions for content items.
  *
  * @since		1.0.0
  *

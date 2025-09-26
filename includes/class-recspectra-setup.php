@@ -66,7 +66,7 @@ class Recspectra_Setup {
 		register_post_type( Recspectra_Slide::post_type_name,
 			array(
 				'labels' => array(
-					'name' => _x( 'Slides', 'slide cpt', 'recspectra' ),
+                                       'name' => _x( 'Content', 'slide cpt', 'recspectra' ),
 					'singular_name' => _x( 'Slide', 'slide cpt', 'recspectra' ),
 					'add_new' =>  _x( 'Add New', 'slide cpt', 'recspectra'),
 					'new_item' => _x( 'New slide', 'slide cpt', 'recspectra' ),
