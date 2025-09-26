@@ -10,16 +10,16 @@
 
 global $post;
 
-$channel = new Foyer_Channel( get_the_id() );
+$channel = new ScreenWP_Channel( get_the_id() );
 ?><div<?php $channel->classes(); ?>>
-	<div class="foyer-slides"><?php
+	<div class="screenwp-slides"><?php
 
 		foreach( $channel->get_slides() as $slide ) {
 
 			$post = get_post( $slide->ID );
 			setup_postdata( $post );
 
-			Foyer_Templates::get_template('partials/slide.php');
+			ScreenWP_Templates::get_template('partials/slide.php');
 
 			wp_reset_postdata();
 		}

@@ -1,0 +1,54 @@
+html {
+	font-size: 100% !important;
+	font-size: (16 / 1080) * 100vmin !important;
+}
+
+.screenwp-slide {
+	width: 100%;
+	height: 100%;
+	background-color: @slide-bg-color;
+
+	position: relative;
+	z-index: 1;
+
+	overflow: hidden;
+
+	.screenwp-slide-field {
+		color: @slide-txt-color;
+
+		font-size: 2rem;
+		line-height: 1.2;
+
+		&.screenwp-slide-field-title {
+			font-size: 5rem;
+			font-weight: bold;
+			margin-bottom: 1rem;
+		}
+		&.screenwp-slide-field-pretitle,
+		&.screenwp-slide-field-subtitle {
+			font-size: 3rem;
+			font-weight: bold;
+			margin-bottom: 1rem;
+		}
+		&.screenwp-slide-field-date {
+			font-size: 3rem;
+			margin-bottom: 1rem;
+		}
+		&.screenwp-slide-field-content {
+			> * {
+				&:last-child {
+					margin-bottom: 0;
+				}
+			}
+		}
+	}
+
+	.screenwp-slide-background {
+		position: absolute;
+		top: 0; bottom: 0;
+		left: 0; right: 0;
+		z-index: -1;
+
+		overflow: hidden;
+	}
+}

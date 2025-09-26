@@ -5,7 +5,7 @@
  * @since	1.7.1
  */
 
-$slide = new Foyer_Slide( get_the_id() );
+$slide = new ScreenWP_Slide( get_the_id() );
 
 $slide_recent_posts_limit = intval( get_post_meta( $slide->ID, 'slide_recent_posts_limit', true ) );
 $slide_recent_posts_categories = get_post_meta( $slide->ID, 'slide_recent_posts_categories', true );
@@ -41,14 +41,14 @@ foreach ( get_posts( $post_args ) as $slide_post ) {
 			<?php if ( ! empty( $slide_post->ID ) ) { ?>
 				<?php if ( ! empty( $slide_recent_posts_display_thumbnail ) && $attachment_id = get_post_thumbnail_id( $slide_post->ID ) ) { ?>
 					<figure>
-						<?php echo wp_get_attachment_image( $attachment_id, 'foyer' ); ?>
+						<?php echo wp_get_attachment_image( $attachment_id, 'screenwp' ); ?>
 					</figure>
 				<?php } ?>
-				<div class="foyer-slide-fields">
-					<div class="foyer-slide-field foyer-slide-field-title"><span><?php echo get_the_title( $slide_post->ID ); ?></span></div>
-					<div class="foyer-slide-field foyer-slide-field-date"><span><?php echo get_the_date( false, $slide_post->ID ); ?></span></div>
+				<div class="screenwp-slide-fields">
+					<div class="screenwp-slide-field screenwp-slide-field-title"><span><?php echo get_the_title( $slide_post->ID ); ?></span></div>
+					<div class="screenwp-slide-field screenwp-slide-field-date"><span><?php echo get_the_date( false, $slide_post->ID ); ?></span></div>
 					<?php if ( ! empty( $content ) ) { ?>
-						<div class="foyer-slide-field foyer-slide-field-content"><?php echo $content; ?></div>
+						<div class="screenwp-slide-field screenwp-slide-field-content"><?php echo $content; ?></div>
 					<?php } ?>
 				</div>
 			<?php } ?>
