@@ -7,5 +7,5 @@
  * @since	1.0.0
  */
 
-$slide = new ScreenWP_Slide( get_the_id() );
-ScreenWP_Templates::get_template('slides/'.$slide->get_format().'.php');
+$slide = new Recspectra_Slide( get_the_id() );
+Recspectra_Templates::get_template('slides/'.$slide->get_format().'.php');

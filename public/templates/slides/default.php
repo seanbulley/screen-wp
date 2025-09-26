@@ -6,7 +6,7 @@
  * @since	1.4.0	Rewrote the template to work with slide background.
  */
 
-$slide = new ScreenWP_Slide( get_the_id() );
+$slide = new Recspectra_Slide( get_the_id() );
 
 ?><div<?php $slide->classes(); ?><?php $slide->data_attr();?>>
 	<div class="inner">

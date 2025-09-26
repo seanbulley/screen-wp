@@ -5,7 +5,7 @@
  * @since	1.3.0
  */
 
-$slide = new ScreenWP_Slide( get_the_id() );
+$slide = new Recspectra_Slide( get_the_id() );
 $url = esc_url( get_post_meta( $slide->ID, 'slide_iframe_website_url', true ) );
 
 ?><div<?php $slide->classes(); ?><?php $slide->data_attr();?>>
