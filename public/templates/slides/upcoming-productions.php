@@ -8,7 +8,7 @@
 
 global $wp_theatre;
 
-$slide = new Recspectra_Slide( get_the_id() );
+$slide = new VUWU_Slide( get_the_id() );
 
 $limit = intval( get_post_meta( $slide->ID, 'slide_upcoming_productions_limit', true ) );
 $categories = get_post_meta( $slide->ID, 'slide_upcoming_productions_categories', true );
@@ -25,16 +25,16 @@ $production_args = array(
 	'end_after' => 'now',
 	'cat' => implode( ',', $categories ),
 	'limit' => $limit,
-	'context' => 'recspectra_slide_upcoming_productions',
+	'context' => 'vuwu_slide_upcoming_productions',
 );
 
 foreach ( $wp_theatre->productions->get( $production_args ) as $production ) {
 
 	?><div<?php $slide->classes(); ?><?php $slide->data_attr();?>>
 		<div class="inner">
-			<div class="recspectra-slide-fields">
-				<div class="recspectra-slide-field recspectra-slide-field-title"><?php echo $production->title(); ?></div>
-				<div class="recspectra-slide-field recspectra-slide-field-date"><?php echo $production->dates_html(); ?></div>
+			<div class="vuwu-slide-fields">
+				<div class="vuwu-slide-field vuwu-slide-field-title"><?php echo $production->title(); ?></div>
+				<div class="vuwu-slide-field vuwu-slide-field-date"><?php echo $production->dates_html(); ?></div>
 			</div>
 		</div><?php
 

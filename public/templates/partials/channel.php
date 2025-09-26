@@ -10,16 +10,16 @@
 
 global $post;
 
-$channel = new Recspectra_Channel( get_the_id() );
+$channel = new VUWU_Channel( get_the_id() );
 ?><div<?php $channel->classes(); ?>>
-	<div class="recspectra-slides"><?php
+	<div class="vuwu-slides"><?php
 
 		foreach( $channel->get_slides() as $slide ) {
 
 			$post = get_post( $slide->ID );
 			setup_postdata( $post );
 
-			Recspectra_Templates::get_template('partials/slide.php');
+			VUWU_Templates::get_template('partials/slide.php');
 
 			wp_reset_postdata();
 		}

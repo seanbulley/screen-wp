@@ -10,7 +10,7 @@
  * @param	string	str		The URL of the video to get the ID for.
  * @return	object			The ID and service of the video, if the URL matched a service.
  */
-function recspectra_get_video_id(str) {
+function vuwu_get_video_id(str) {
 	if (typeof str !== 'string') {
 		throw new TypeError('get-video-id expects a string');
 	}
@@ -22,22 +22,22 @@ function recspectra_get_video_id(str) {
 
 	if (/youtube|youtu\.be/.test(str)) {
 		metadata = {
-			id: recspectra_get_video_id_youtube(str),
+			id: vuwu_get_video_id_youtube(str),
 			service: 'youtube'
 		};
 	} else if (/vimeo/.test(str)) {
 		metadata = {
-			id: recspectra_get_video_id_vimeo(str),
+			id: vuwu_get_video_id_vimeo(str),
 			service: 'vimeo'
 		};
 	} else if (/vine/.test(str)) {
 		metadata = {
-			id: recspectra_get_video_id_vine(str),
+			id: vuwu_get_video_id_vine(str),
 			service: 'vine'
 		};
 	} else if (/videopress/.test(str)) {
 		metadata = {
-			id: recspectra_get_video_id_videopress(str),
+			id: vuwu_get_video_id_videopress(str),
 			service: 'videopress'
 		};
 	}
@@ -49,7 +49,7 @@ function recspectra_get_video_id(str) {
  * @param {string} str - the url from which you want to extract the id
  * @returns {string|undefined}
  */
-function recspectra_get_video_id_vimeo(str) {
+function vuwu_get_video_id_vimeo(str) {
 	if (str.indexOf('#') > -1) {
 		str = str.split('#')[0];
 	}
@@ -72,7 +72,7 @@ function recspectra_get_video_id_vimeo(str) {
  * @param {string} str - the url from which you want to extract the id
  * @returns {string|undefined}
  */
-function recspectra_get_video_id_vine(str) {
+function vuwu_get_video_id_vine(str) {
 	var regex = /https:\/\/vine\.co\/v\/([a-zA-Z0-9]*)\/?/;
 	var matches = regex.exec(str);
 	return matches && matches[1];
@@ -83,13 +83,13 @@ function recspectra_get_video_id_vine(str) {
  * @param {string} str - the url from which you want to extract the id
  * @returns {string|undefined}
  */
-function recspectra_get_video_id_youtube(str) {
+function vuwu_get_video_id_youtube(str) {
 	// shortcode
 	var shortcode = /youtube:\/\/|https?:\/\/youtu\.be\//g;
 
 	if (shortcode.test(str)) {
 		var shortcodeid = str.split(shortcode)[1];
-		return recspectra_get_video_id_stripParameters(shortcodeid);
+		return vuwu_get_video_id_stripParameters(shortcodeid);
 	}
 
 	// /v/ or /vi/
@@ -97,7 +97,7 @@ function recspectra_get_video_id_youtube(str) {
 
 	if (inlinev.test(str)) {
 		var inlineid = str.split(inlinev)[1];
-		return recspectra_get_video_id_stripParameters(inlineid);
+		return vuwu_get_video_id_stripParameters(inlineid);
 	}
 
 	// v= or vi=
@@ -113,7 +113,7 @@ function recspectra_get_video_id_youtube(str) {
 
 	if (embedreg.test(str)) {
 		var embedid = str.split(embedreg)[1];
-		return recspectra_get_video_id_stripParameters(embedid);
+		return vuwu_get_video_id_stripParameters(embedid);
 	}
 
 	// user
@@ -121,7 +121,7 @@ function recspectra_get_video_id_youtube(str) {
 
 	if (userreg.test(str)) {
 		var elements = str.split('/');
-		return recspectra_get_video_id_stripParameters(elements.pop());
+		return vuwu_get_video_id_stripParameters(elements.pop());
 	}
 
 	// attribution_link
@@ -137,7 +137,7 @@ function recspectra_get_video_id_youtube(str) {
  * @param {string} str - the url from which you want to extract the id
  * @returns {string|undefined}
  */
-function recspectra_get_video_id_videopress(str) {
+function vuwu_get_video_id_videopress(str) {
 	var idRegex;
 	if (str.indexOf('embed') > -1) {
 		idRegex = /embed\/(\w{8})/;
@@ -153,7 +153,7 @@ function recspectra_get_video_id_videopress(str) {
  * @param str
  * @returns {*}
  */
-function recspectra_get_video_id_stripParameters(str) {
+function vuwu_get_video_id_stripParameters(str) {
 	if (str.indexOf('?') > -1) {
 		return str.split('?')[0];
 	}

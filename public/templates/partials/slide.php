@@ -7,5 +7,6 @@
  * @since	1.0.0
  */
 
-$slide = new Recspectra_Slide( get_the_id() );
-Recspectra_Templates::get_template('slides/'.$slide->get_format().'.php');
+$slide = new VUWU_Slide( get_the_id() );
+VUWU_Templates::get_template('slides/'.$slide->get_format().'.php');
+
