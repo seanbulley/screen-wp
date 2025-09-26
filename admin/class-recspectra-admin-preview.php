@@ -23,24 +23,27 @@ class Recspectra_Admin_Preview {
 	 */
 	static function enqueue_scripts() {
 
-		wp_register_script( Recspectra::get_plugin_name() . '-admin', plugin_dir_url( __FILE__ ) . 'js/recspectra-admin-min.js', array( 'jquery', 'jquery-ui-sortable' ), Recspectra::get_version(), false );
+                wp_register_script( Recspectra::get_plugin_name() . '-admin', plugin_dir_url( __FILE__ ) . 'js/recspectra-admin-min.js', array( 'jquery', 'jquery-ui-sortable' ), Recspectra::get_version(), true );
 
-		wp_localize_script( Recspectra::get_plugin_name() . '-admin', 'recspectra_preview', array(
-			'ajax_url' => admin_url( 'admin-ajax.php' ),
-			'object_id' => get_the_id(),
-			'orientations' => self::get_orientations(),
-		) );
+                wp_localize_script( Recspectra::get_plugin_name() . '-admin', 'recspectra_preview', array(
+                        'ajax_url'    => admin_url( 'admin-ajax.php' ),
+                        'object_id'   => get_the_ID(),
+                        'orientations' => self::get_orientations(),
+                        'nonce'       => wp_create_nonce( 'recspectra_preview_orientation' ),
+                ) );
 
-		if ( ! is_user_logged_in() ) {
-			return;
-		}
+                if ( ! is_user_logged_in() ) {
+                        return;
+                }
 
-		if ( ! empty( $_GET['recspectra-preview'] ) ) {
-			return;
-		}
+                $is_preview = isset( $_GET['recspectra-preview'] ) ? sanitize_text_field( wp_unslash( $_GET['recspectra-preview'] ) ) : '';
 
-		if ( ! is_singular( array( Recspectra_Display::post_type_name, Recspectra_Channel::post_type_name, Recspectra_Slide::post_type_name) ) ) {
-			return;
+                if ( ! empty( $is_preview ) ) {
+                        return;
+                }
+
+                if ( ! is_singular( array( Recspectra_Display::post_type_name, Recspectra_Channel::post_type_name, Recspectra_Slide::post_type_name) ) ) {
+                        return;
 		}
 
 		wp_enqueue_script( Recspectra::get_plugin_name() . '-admin' );
@@ -100,9 +103,11 @@ class Recspectra_Admin_Preview {
 		}
 
 		// Don't hide if not inside preview iframe.
-		if ( empty( $_GET['recspectra-preview'] ) ) {
-			return true;
-		}
+                $is_preview = isset( $_GET['recspectra-preview'] ) ? sanitize_text_field( wp_unslash( $_GET['recspectra-preview'] ) ) : '';
+
+                if ( empty( $is_preview ) ) {
+                        return true;
+                }
 
 		// Don't hide if not viewing a Display, Channel of Slide.
 		if (!is_singular( array( Recspectra_Display::post_type_name, Recspectra_Channel::post_type_name, Recspectra_Slide::post_type_name) ) ) {
@@ -125,30 +130,32 @@ class Recspectra_Admin_Preview {
 	 */
 	static function save_orientation_choice( ) {
 
-		if ( !is_user_logged_in( ) ) {
-			return;
-		}
+                if ( ! is_user_logged_in() ) {
+                        wp_send_json_error( array(), 403 );
+                }
 
-		$orientation = sanitize_title( $_POST[ 'orientation' ] );
-		if ( empty(  $orientation ) ) {
-			return;
-		}
+                check_ajax_referer( 'recspectra_preview_orientation', 'nonce' );
 
-		$object_id = intval( $_POST[ 'object_id' ] );
-		if ( empty(  $object_id ) ) {
-			return;
-		}
+                $orientation = isset( $_POST['orientation'] ) ? sanitize_title( wp_unslash( $_POST['orientation'] ) ) : '';
+                if ( empty( $orientation ) ) {
+                        wp_send_json_error();
+                }
 
-		$orientation_choices = get_user_meta( get_current_user_id( ), 'recspectra_preview_orientation_choices', true );
+                $object_id = isset( $_POST['object_id'] ) ? intval( wp_unslash( $_POST['object_id'] ) ) : 0;
+                if ( empty( $object_id ) ) {
+                        wp_send_json_error();
+                }
 
-		if (empty( $orientation_choices )) {
-			$orientation_choices = array();
-		}
+                $orientation_choices = get_user_meta( get_current_user_id(), 'recspectra_preview_orientation_choices', true );
 
-		$orientation_choices[ $object_id ] = $orientation;
+                if ( empty( $orientation_choices ) ) {
+                        $orientation_choices = array();
+                }
 
-		update_user_meta( get_current_user_id( ), 'recspectra_preview_orientation_choices', $orientation_choices );
+                $orientation_choices[ $object_id ] = $orientation;
 
-		wp_die();
-	}
+                update_user_meta( get_current_user_id(), 'recspectra_preview_orientation_choices', $orientation_choices );
+
+                wp_send_json_success();
+        }
 }

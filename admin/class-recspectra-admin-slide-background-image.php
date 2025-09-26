@@ -21,10 +21,10 @@ class Recspectra_Admin_Slide_Background_Image {
 	 * @return 	void
 	 */
 	static function save_slide_background( $post_id ) {
-		$slide_bg_image_image = intval( $_POST['slide_bg_image_image'] );
-		if ( empty( $slide_bg_image_image ) ) {
-			$slide_bg_image_image = '';
-		}
+                $slide_bg_image_image = isset( $_POST['slide_bg_image_image'] ) ? intval( wp_unslash( $_POST['slide_bg_image_image'] ) ) : 0;
+                if ( empty( $slide_bg_image_image ) ) {
+                        $slide_bg_image_image = '';
+                }
 
 		update_post_meta( $post_id, 'slide_bg_image_image', $slide_bg_image_image );
 	}

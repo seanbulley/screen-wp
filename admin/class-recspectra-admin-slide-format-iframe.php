@@ -19,9 +19,9 @@ class Recspectra_Admin_Slide_Format_Iframe {
 	 * @return	void
 	 */
 	static function save_slide( $post_id ) {
-		$slide_iframe_website_url = sanitize_text_field( $_POST['slide_iframe_website_url'] );
-		update_post_meta( $post_id, 'slide_iframe_website_url', $slide_iframe_website_url );
-	}
+                $slide_iframe_website_url = isset( $_POST['slide_iframe_website_url'] ) ? sanitize_text_field( wp_unslash( $_POST['slide_iframe_website_url'] ) ) : '';
+                update_post_meta( $post_id, 'slide_iframe_website_url', $slide_iframe_website_url );
+        }
 
 	/**
 	 * Outputs the meta box for the Iframe slide format.

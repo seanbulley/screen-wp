@@ -56,8 +56,7 @@ class Recspectra_Admin {
 		/* Recspectra_Admin_Preview */
 		add_action( 'wp_enqueue_scripts', array( 'Recspectra_Admin_Preview', 'enqueue_scripts' ) );
 		add_filter( 'show_admin_bar', array( 'Recspectra_Admin_Preview', 'hide_admin_bar' ) );
-		add_action( 'wp_ajax_recspectra_preview_save_orientation_choice', array( 'Recspectra_Admin_Preview', 'save_orientation_choice' ) );
-		add_action( 'wp_ajax_nopriv_recspectra_preview_save_orientation_choice', array( 'Recspectra_Admin_Preview', 'save_orientation_choice' ) );
+                add_action( 'wp_ajax_recspectra_preview_save_orientation_choice', array( 'Recspectra_Admin_Preview', 'save_orientation_choice' ) );
 
 		/* Recspectra_Admin_Slide_Format_PDF */
 		add_filter( 'wp_image_editors', array( 'Recspectra_Admin_Slide_Format_PDF', 'add_recspectra_imagick_image_editor' ) );
@@ -94,11 +93,15 @@ class Recspectra_Admin {
 	 *					Changed handle of script to {plugin_name}-admin.
 	 * @since	1.3.2	Changed method to static.
 	 */
-	static function enqueue_scripts() {
+        static function enqueue_scripts() {
 
-		wp_register_script( Recspectra::get_plugin_name() . '-admin', plugin_dir_url( __FILE__ ) . 'js/recspectra-admin-min.js', array( 'jquery', 'jquery-ui-sortable' ), Recspectra::get_version(), false );
-		wp_enqueue_script( Recspectra::get_plugin_name() . '-admin' );
-	}
+                if ( ! self::should_enqueue_admin_assets() ) {
+                        return;
+                }
+
+                wp_register_script( Recspectra::get_plugin_name() . '-admin', plugin_dir_url( __FILE__ ) . 'js/recspectra-admin-min.js', array( 'jquery', 'jquery-ui-sortable' ), Recspectra::get_version(), true );
+                wp_enqueue_script( Recspectra::get_plugin_name() . '-admin' );
+        }
 
 	/**
 	 * Enqueues the stylesheets for the admin area.
@@ -106,10 +109,45 @@ class Recspectra_Admin {
 	 * @since	1.0.0
 	 * @since	1.3.2	Changed method to static.
 	 */
-	static function enqueue_styles() {
+        static function enqueue_styles() {
 
-		wp_enqueue_style( Recspectra::get_plugin_name(), plugin_dir_url( __FILE__ ) . 'css/recspectra-admin.css', array(), Recspectra::get_version(), 'all' );
-	}
+                if ( ! self::should_enqueue_admin_assets() ) {
+                        return;
+                }
+
+                wp_enqueue_style( Recspectra::get_plugin_name(), plugin_dir_url( __FILE__ ) . 'css/recspectra-admin.css', array(), Recspectra::get_version(), 'all' );
+        }
+
+        /**
+         * Determines whether admin assets should be enqueued for the current screen.
+         *
+         * @since 1.8.0
+         *
+         * @return bool
+         */
+        private static function should_enqueue_admin_assets() {
+                if ( ! is_admin() ) {
+                        return false;
+                }
+
+                $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+
+                if ( empty( $screen ) ) {
+                        return false;
+                }
+
+                if ( 'toplevel_page_recspectra' === $screen->id ) {
+                        return true;
+                }
+
+                $post_types = array(
+                        Recspectra_Display::post_type_name,
+                        Recspectra_Channel::post_type_name,
+                        Recspectra_Slide::post_type_name,
+                );
+
+                return in_array( $screen->post_type, $post_types, true );
+        }
 
 	/**
 	 * Loads the required dependencies for the admin-facing side of the plugin.

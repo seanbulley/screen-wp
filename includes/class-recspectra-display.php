@@ -82,7 +82,9 @@ class Recspectra_Display {
 
 		$classes[] = 'recspectra-display';
 
-		if ( $this->is_reset_requested() && empty( $_GET['recspectra-preview'] ) ) {
+                $preview_flag = isset( $_GET['recspectra-preview'] ) ? sanitize_text_field( wp_unslash( $_GET['recspectra-preview'] ) ) : '';
+
+                if ( $this->is_reset_requested() && empty( $preview_flag ) ) {
 			// Reset is requested and we are not previewing, add class to invoke reset
 			$classes[] = 'recspectra-reset-display';
 

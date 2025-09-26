@@ -47,12 +47,16 @@ class Recspectra_Admin_Channel {
 
 		check_ajax_referer( 'recspectra_slides_editor_ajax_nonce', 'nonce' , true );
 
-		$channel_id = intval( $_POST['channel_id'] );
-		$add_slide_id = intval( $_POST['slide_id'] );
+                $channel_id = isset( $_POST['channel_id'] ) ? intval( wp_unslash( $_POST['channel_id'] ) ) : 0;
+                $add_slide_id = isset( $_POST['slide_id'] ) ? intval( wp_unslash( $_POST['slide_id'] ) ) : 0;
 
-		if ( empty( $channel_id ) || empty( $add_slide_id ) ) {
-			wp_die();
-		}
+                if ( empty( $channel_id ) || empty( $add_slide_id ) ) {
+                        wp_die();
+                }
+
+                if ( ! current_user_can( 'edit_post', $channel_id ) ) {
+                        wp_die();
+                }
 
 		/* Check if the channel post exists */
 		if ( is_null( get_post( $channel_id  ) ) ) {
@@ -459,12 +463,18 @@ class Recspectra_Admin_Channel {
 	 */
 	static function localize_scripts() {
 
-		$defaults = array( 'confirm_remove_message' => esc_html__( 'Are you sure you want to remove this slide from the channel?', 'recspectra' ) );
-		wp_localize_script( Recspectra::get_plugin_name() . '-admin', 'recspectra_slides_editor_defaults', $defaults );
+                $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 
-		$security = array( 'nonce' => wp_create_nonce( 'recspectra_slides_editor_ajax_nonce' ) );
-		wp_localize_script( Recspectra::get_plugin_name() . '-admin', 'recspectra_slides_editor_security', $security );
-	}
+                if ( empty( $screen ) || Recspectra_Channel::post_type_name !== $screen->post_type ) {
+                        return;
+                }
+
+                $defaults = array( 'confirm_remove_message' => esc_html__( 'Are you sure you want to remove this slide from the channel?', 'recspectra' ) );
+                wp_localize_script( Recspectra::get_plugin_name() . '-admin', 'recspectra_slides_editor_defaults', $defaults );
+
+                $security = array( 'nonce' => wp_create_nonce( 'recspectra_slides_editor_ajax_nonce' ) );
+                wp_localize_script( Recspectra::get_plugin_name() . '-admin', 'recspectra_slides_editor_security', $security );
+        }
 
 	/**
 	 * Removes the sample permalink from the Channel edit screen.
@@ -501,12 +511,16 @@ class Recspectra_Admin_Channel {
 
 		check_ajax_referer( 'recspectra_slides_editor_ajax_nonce', 'nonce' , true );
 
-		$channel_id = intval( $_POST['channel_id'] );
-		$remove_slide_key = intval( $_POST['slide_key'] );
+                $channel_id = isset( $_POST['channel_id'] ) ? intval( wp_unslash( $_POST['channel_id'] ) ) : 0;
+                $remove_slide_key = isset( $_POST['slide_key'] ) ? intval( wp_unslash( $_POST['slide_key'] ) ) : 0;
 
-		if ( empty( $channel_id ) ) {
-			wp_die();
-		}
+                if ( empty( $channel_id ) ) {
+                        wp_die();
+                }
+
+                if ( ! current_user_can( 'edit_post', $channel_id ) ) {
+                        wp_die();
+                }
 
 		/* Check if this post exists */
 		if ( is_null( get_post( $channel_id  ) ) ) {
@@ -550,12 +564,17 @@ class Recspectra_Admin_Channel {
 
 		check_ajax_referer( 'recspectra_slides_editor_ajax_nonce', 'nonce' , true );
 
-		$channel_id = intval( $_POST['channel_id'] );
-		$slide_ids = array_map( 'intval', $_POST['slide_ids'] );
+                $channel_id = isset( $_POST['channel_id'] ) ? intval( wp_unslash( $_POST['channel_id'] ) ) : 0;
+                $posted_slide_ids = isset( $_POST['slide_ids'] ) ? (array) wp_unslash( $_POST['slide_ids'] ) : array();
+                $slide_ids = array_map( 'intval', $posted_slide_ids );
 
-		if ( empty( $channel_id ) || empty( $slide_ids ) ) {
-			wp_die();
-		}
+                if ( empty( $channel_id ) || empty( $slide_ids ) ) {
+                        wp_die();
+                }
+
+                if ( ! current_user_can( 'edit_post', $channel_id ) ) {
+                        wp_die();
+                }
 
 		/* Check if this post exists */
 		if ( is_null( get_post( $channel_id  ) ) ) {
@@ -593,11 +612,11 @@ class Recspectra_Admin_Channel {
 		 */
 
 		/* Check if our nonce is set */
-		if ( ! isset( $_POST[Recspectra_Channel::post_type_name.'_nonce'] ) ) {
-			return $post_id;
-		}
+                if ( ! isset( $_POST[Recspectra_Channel::post_type_name.'_nonce'] ) ) {
+                        return $post_id;
+                }
 
-		$nonce = $_POST[Recspectra_Channel::post_type_name.'_nonce'];
+                $nonce = sanitize_text_field( wp_unslash( $_POST[Recspectra_Channel::post_type_name.'_nonce'] ) );
 
 		/* Verify that the nonce is valid */
 		if ( ! wp_verify_nonce( $nonce, Recspectra_Channel::post_type_name ) ) {
@@ -622,12 +641,12 @@ class Recspectra_Admin_Channel {
 			return $post_id;
 		}
 
-		$recspectra_slides_settings_duration = intval( $_POST['recspectra_slides_settings_duration'] );
-		if ( empty( $recspectra_slides_settings_duration ) ) {
-			$recspectra_slides_settings_duration = '';
-		}
+                $recspectra_slides_settings_duration = intval( wp_unslash( $_POST['recspectra_slides_settings_duration'] ) );
+                if ( empty( $recspectra_slides_settings_duration ) ) {
+                        $recspectra_slides_settings_duration = '';
+                }
 
-		$recspectra_slides_settings_transition = sanitize_title( $_POST['recspectra_slides_settings_transition'] );
+                $recspectra_slides_settings_transition = sanitize_title( wp_unslash( $_POST['recspectra_slides_settings_transition'] ) );
 		if ( empty( $recspectra_slides_settings_transition ) ) {
 			$recspectra_slides_settings_transition = '';
 		}

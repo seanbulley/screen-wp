@@ -357,9 +357,15 @@ class Recspectra_Admin_Display {
 	 */
 	static function localize_scripts() {
 
-		$channel_scheduler_defaults = self::get_channel_scheduler_defaults();
-		wp_localize_script( Recspectra::get_plugin_name() . '-admin', 'recspectra_channel_scheduler_defaults', $channel_scheduler_defaults );
-	}
+                $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+
+                if ( empty( $screen ) || Recspectra_Display::post_type_name !== $screen->post_type ) {
+                        return;
+                }
+
+                $channel_scheduler_defaults = self::get_channel_scheduler_defaults();
+                wp_localize_script( Recspectra::get_plugin_name() . '-admin', 'recspectra_channel_scheduler_defaults', $channel_scheduler_defaults );
+        }
 
 	/**
 	 * Saves all custom fields for a display.
@@ -381,11 +387,11 @@ class Recspectra_Admin_Display {
 		 */
 
 		/* Check if our nonce is set */
-		if ( ! isset( $_POST[Recspectra_Display::post_type_name.'_nonce'] ) ) {
-			return $post_id;
-		}
+                if ( ! isset( $_POST[Recspectra_Display::post_type_name.'_nonce'] ) ) {
+                        return $post_id;
+                }
 
-		$nonce = $_POST[Recspectra_Display::post_type_name.'_nonce'];
+                $nonce = sanitize_text_field( wp_unslash( $_POST[Recspectra_Display::post_type_name.'_nonce'] ) );
 
 		/* Verify that the nonce is valid */
 		if ( ! wp_verify_nonce( $nonce, Recspectra_Display::post_type_name ) ) {
@@ -404,8 +410,12 @@ class Recspectra_Admin_Display {
 
 		/* Input validation */
 		/* See: https://codex.wordpress.org/Data_Validation#Input_Validation */
-		$channel = intval( $_POST['recspectra_channel_editor_default_channel'] );
-		$display_id = intval( $_POST['recspectra_channel_editor_' . Recspectra_Display::post_type_name] );
+                if ( ! isset( $_POST['recspectra_channel_editor_' . Recspectra_Display::post_type_name] ) ) {
+                        return $post_id;
+                }
+
+                $channel = isset( $_POST['recspectra_channel_editor_default_channel'] ) ? intval( wp_unslash( $_POST['recspectra_channel_editor_default_channel'] ) ) : 0;
+                $display_id = intval( wp_unslash( $_POST['recspectra_channel_editor_' . Recspectra_Display::post_type_name] ) );
 
 		if ( empty( $display_id ) ) {
 			return $post_id;
@@ -443,20 +453,28 @@ class Recspectra_Admin_Display {
 
 		delete_post_meta( $display_id, 'recspectra_display_schedule' );
 
-		$recspectra_channel_editor_scheduled_channel = intval( $_POST['recspectra_channel_editor_scheduled_channel'] );
-		if ( empty( $recspectra_channel_editor_scheduled_channel ) ) {
-			return;
-		}
+                if ( ! isset( $_POST['recspectra_channel_editor_scheduled_channel'] ) ) {
+                        return;
+                }
 
-		$recspectra_channel_editor_scheduled_channel_start = sanitize_text_field( $_POST['recspectra_channel_editor_scheduled_channel_start'] );
-		if ( empty( $recspectra_channel_editor_scheduled_channel_start ) ) {
-			return;
-		}
+                $recspectra_channel_editor_scheduled_channel = intval( wp_unslash( $_POST['recspectra_channel_editor_scheduled_channel'] ) );
+                if ( empty( $recspectra_channel_editor_scheduled_channel ) ) {
+                        return;
+                }
 
-		$recspectra_channel_editor_scheduled_channel_end = sanitize_text_field( $_POST['recspectra_channel_editor_scheduled_channel_end'] );
-		if ( empty( $recspectra_channel_editor_scheduled_channel_end ) ) {
-			return;
-		}
+                if ( ! isset( $_POST['recspectra_channel_editor_scheduled_channel_start'], $_POST['recspectra_channel_editor_scheduled_channel_end'] ) ) {
+                        return;
+                }
+
+                $recspectra_channel_editor_scheduled_channel_start = sanitize_text_field( wp_unslash( $_POST['recspectra_channel_editor_scheduled_channel_start'] ) );
+                if ( empty( $recspectra_channel_editor_scheduled_channel_start ) ) {
+                        return;
+                }
+
+                $recspectra_channel_editor_scheduled_channel_end = sanitize_text_field( wp_unslash( $_POST['recspectra_channel_editor_scheduled_channel_end'] ) );
+                if ( empty( $recspectra_channel_editor_scheduled_channel_end ) ) {
+                        return;
+                }
 
 		/**
 		 * Store all scheduled channels.

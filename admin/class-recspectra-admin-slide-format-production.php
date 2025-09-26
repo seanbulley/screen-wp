@@ -22,10 +22,10 @@ class Recspectra_Admin_Slide_Format_Production {
 	 * @return	void
 	 */
 	static function save_slide_production( $post_id ) {
-		$slide_production_production_id = intval( $_POST['slide_production_production_id'] );
-		if ( empty( $slide_production_production_id ) ) {
-			$slide_production_production_id = '';
-		}
+                $slide_production_production_id = isset( $_POST['slide_production_production_id'] ) ? intval( wp_unslash( $_POST['slide_production_production_id'] ) ) : 0;
+                if ( empty( $slide_production_production_id ) ) {
+                        $slide_production_production_id = '';
+                }
 
 		update_post_meta( $post_id, 'slide_production_production_id', $slide_production_production_id );
 	}

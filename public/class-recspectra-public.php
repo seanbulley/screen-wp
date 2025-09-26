@@ -84,8 +84,11 @@ class Recspectra_Public {
 			return;
 		}
 
-		?><link rel="manifest" href="<?php echo RECSPECTRA_PLUGIN_URL; ?>public/assets/manifest.json"><?php
-	}
+                printf(
+                        '<link rel="manifest" href="%s">',
+                        esc_url( RECSPECTRA_PLUGIN_URL . 'public/assets/manifest.json' )
+                );
+        }
 
 	/**
 	 * Register the stylesheets for the public-facing side of the plugin.
@@ -131,7 +134,7 @@ class Recspectra_Public {
 	 */
 	static function enqueue_scripts() {
 
-		wp_register_script( Recspectra::get_plugin_name(), plugin_dir_url( __FILE__ ) . 'js/recspectra-public-min.js', array( 'jquery' ), Recspectra::get_version(), false );
+                wp_register_script( Recspectra::get_plugin_name(), plugin_dir_url( __FILE__ ) . 'js/recspectra-public-min.js', array( 'jquery' ), Recspectra::get_version(), true );
 
 		if ( ! is_singular( array( Recspectra_Display::post_type_name, Recspectra_Channel::post_type_name, Recspectra_Slide::post_type_name) ) ) {
 			return;

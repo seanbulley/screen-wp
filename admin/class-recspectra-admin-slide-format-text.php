@@ -19,10 +19,10 @@ class Recspectra_Admin_Slide_Format_Text {
 	 * @return	void
 	 */
 	static function save_slide( $post_id ) {
-		$slide_text_pretitle = sanitize_text_field( $_POST['slide_text_pretitle'] );
-		$slide_text_title = sanitize_text_field( $_POST['slide_text_title'] );
-		$slide_text_subtitle = sanitize_text_field( $_POST['slide_text_subtitle'] );
-		$slide_text_content = wp_kses_post( $_POST['slide_text_content'] );
+                $slide_text_pretitle = isset( $_POST['slide_text_pretitle'] ) ? sanitize_text_field( wp_unslash( $_POST['slide_text_pretitle'] ) ) : '';
+                $slide_text_title = isset( $_POST['slide_text_title'] ) ? sanitize_text_field( wp_unslash( $_POST['slide_text_title'] ) ) : '';
+                $slide_text_subtitle = isset( $_POST['slide_text_subtitle'] ) ? sanitize_text_field( wp_unslash( $_POST['slide_text_subtitle'] ) ) : '';
+                $slide_text_content = isset( $_POST['slide_text_content'] ) ? wp_kses_post( wp_unslash( $_POST['slide_text_content'] ) ) : '';
 
 		update_post_meta( $post_id, 'slide_text_pretitle', $slide_text_pretitle );
 		update_post_meta( $post_id, 'slide_text_title', $slide_text_title );

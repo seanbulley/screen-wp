@@ -19,34 +19,34 @@ class Recspectra_Admin_Slide_Format_Recent_Posts {
 	 * @return	void
 	 */
 	static function save_slide( $post_id ) {
-		$slide_recent_posts_limit = intval( $_POST['slide_recent_posts_limit'] );
-		if ( empty( $slide_recent_posts_limit ) ) {
-			$slide_recent_posts_limit = '';
-		}
+                $slide_recent_posts_limit = isset( $_POST['slide_recent_posts_limit'] ) ? intval( wp_unslash( $_POST['slide_recent_posts_limit'] ) ) : 0;
+                if ( empty( $slide_recent_posts_limit ) ) {
+                        $slide_recent_posts_limit = '';
+                }
 
 		$slide_recent_posts_categories = '';
 		if (
 			! empty( $_POST['slide_recent_posts_categories'] ) &&
 			! empty( $_POST['slide_recent_posts_categories'][0] )
 		) {
-			$slide_recent_posts_categories = array_map( 'intval', $_POST['slide_recent_posts_categories'] );
-		}
+                        $slide_recent_posts_categories = array_map( 'intval', (array) wp_unslash( $_POST['slide_recent_posts_categories'] ) );
+                }
 
-		$slide_recent_posts_display_thumbnail = '';
-		if ( isset( $_POST['slide_recent_posts_display_thumbnail'] ) ) {
-			$slide_recent_posts_display_thumbnail = intval( $_POST['slide_recent_posts_display_thumbnail'] );
-			if ( empty( $slide_recent_posts_display_thumbnail ) ) {
-				$slide_recent_posts_display_thumbnail = '';
-			}
-		}
+                $slide_recent_posts_display_thumbnail = '';
+                if ( isset( $_POST['slide_recent_posts_display_thumbnail'] ) ) {
+                        $slide_recent_posts_display_thumbnail = intval( wp_unslash( $_POST['slide_recent_posts_display_thumbnail'] ) );
+                        if ( empty( $slide_recent_posts_display_thumbnail ) ) {
+                                $slide_recent_posts_display_thumbnail = '';
+                        }
+                }
 
-		$slide_recent_posts_use_excerpt = '';
-		if ( isset( $_POST['slide_recent_posts_use_excerpt'] ) ) {
-			$slide_recent_posts_use_excerpt = intval( $_POST['slide_recent_posts_use_excerpt'] );
-			if ( empty( $slide_recent_posts_use_excerpt ) ) {
-				$slide_recent_posts_use_excerpt = '';
-			}
-		}
+                $slide_recent_posts_use_excerpt = '';
+                if ( isset( $_POST['slide_recent_posts_use_excerpt'] ) ) {
+                        $slide_recent_posts_use_excerpt = intval( wp_unslash( $_POST['slide_recent_posts_use_excerpt'] ) );
+                        if ( empty( $slide_recent_posts_use_excerpt ) ) {
+                                $slide_recent_posts_use_excerpt = '';
+                        }
+                }
 
 		update_post_meta( $post_id, 'slide_recent_posts_limit', $slide_recent_posts_limit );
 		update_post_meta( $post_id, 'slide_recent_posts_categories', $slide_recent_posts_categories );
