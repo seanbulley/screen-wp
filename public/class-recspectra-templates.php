@@ -151,11 +151,13 @@ class Recspectra_Templates {
 
 		$file = '';
 
-		if (
-			is_singular( array( Recspectra_Slide::post_type_name, Recspectra_Channel::post_type_name, Recspectra_Display::post_type_name ) ) &&
-			is_user_logged_in( ) &&
-			empty( $_GET['recspectra-preview'] )
-		) {
+                $preview_flag = isset( $_GET['recspectra-preview'] ) ? sanitize_text_field( wp_unslash( $_GET['recspectra-preview'] ) ) : '';
+
+                if (
+                        is_singular( array( Recspectra_Slide::post_type_name, Recspectra_Channel::post_type_name, Recspectra_Display::post_type_name ) ) &&
+                        is_user_logged_in( ) &&
+                        empty( $preview_flag )
+                ) {
 			// Show inside preview iframe when logged in.
 			$file = 'preview.php';
 		}

@@ -19,26 +19,26 @@ class Recspectra_Admin_Slide_Format_Post {
 	 * @return	void
 	 */
 	static function save_slide( $post_id ) {
-		$slide_post_post_id = intval( $_POST['slide_post_post_id'] );
-		if ( empty( $slide_post_post_id ) ) {
-			$slide_post_post_id = '';
-		}
+                $slide_post_post_id = isset( $_POST['slide_post_post_id'] ) ? intval( wp_unslash( $_POST['slide_post_post_id'] ) ) : 0;
+                if ( empty( $slide_post_post_id ) ) {
+                        $slide_post_post_id = '';
+                }
 
-		$slide_post_display_thumbnail = '';
-		if ( isset( $_POST['slide_post_display_thumbnail'] ) ) {
-			$slide_post_display_thumbnail = intval( $_POST['slide_post_display_thumbnail'] );
-			if ( empty( $slide_post_display_thumbnail ) ) {
-				$slide_post_display_thumbnail = '';
-			}
-		}
+                $slide_post_display_thumbnail = '';
+                if ( isset( $_POST['slide_post_display_thumbnail'] ) ) {
+                        $slide_post_display_thumbnail = intval( wp_unslash( $_POST['slide_post_display_thumbnail'] ) );
+                        if ( empty( $slide_post_display_thumbnail ) ) {
+                                $slide_post_display_thumbnail = '';
+                        }
+                }
 
-		$slide_post_use_excerpt = '';
-		if ( isset( $_POST['slide_post_use_excerpt'] ) ) {
-			$slide_post_use_excerpt = intval( $_POST['slide_post_use_excerpt'] );
-			if ( empty( $slide_post_use_excerpt ) ) {
-				$slide_post_use_excerpt = '';
-			}
-		}
+                $slide_post_use_excerpt = '';
+                if ( isset( $_POST['slide_post_use_excerpt'] ) ) {
+                        $slide_post_use_excerpt = intval( wp_unslash( $_POST['slide_post_use_excerpt'] ) );
+                        if ( empty( $slide_post_use_excerpt ) ) {
+                                $slide_post_use_excerpt = '';
+                        }
+                }
 
 		update_post_meta( $post_id, 'slide_post_post_id', $slide_post_post_id );
 		update_post_meta( $post_id, 'slide_post_display_thumbnail', $slide_post_display_thumbnail );

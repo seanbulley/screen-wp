@@ -12,7 +12,10 @@
  * @wordpress-plugin
  * Plugin Name: Recspectra
  * Description: Digital signage tools for WordPress.
- * Version: 1.7.5
+ * Version: 1.8.0
+ * Requires at least: 6.0
+ * Requires PHP: 7.4
+ * Tested up to: 6.8
  * Author: Recspectra
  * Text Domain: recspectra
  * Domain Path: /languages
@@ -52,7 +55,7 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-recspectra.php';
  */
 function run_recspectra() {
 
-	define( 'RECSPECTRA_PLUGIN_VERSION', '1.7.5' ); // do not access directly
+        define( 'RECSPECTRA_PLUGIN_VERSION', '1.8.0' ); // do not access directly
 	define( 'RECSPECTRA_PLUGIN_NAME', 'recspectra' ); // do not access directly
 	define( 'RECSPECTRA_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 	define( 'RECSPECTRA_PLUGIN_URL', trailingslashit( plugins_url( '', __FILE__ ) ) );

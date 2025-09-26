@@ -19,18 +19,18 @@ class Recspectra_Admin_Slide_Format_Upcoming_Productions {
 	 * @return	void
 	 */
 	static function save_slide( $post_id ) {
-		$slide_upcoming_productions_limit = intval( $_POST['slide_upcoming_productions_limit'] );
-		if ( empty( $slide_upcoming_productions_limit ) ) {
-			$slide_upcoming_productions_limit = '';
-		}
+                $slide_upcoming_productions_limit = isset( $_POST['slide_upcoming_productions_limit'] ) ? intval( wp_unslash( $_POST['slide_upcoming_productions_limit'] ) ) : 0;
+                if ( empty( $slide_upcoming_productions_limit ) ) {
+                        $slide_upcoming_productions_limit = '';
+                }
 
-		$slide_upcoming_productions_categories = '';
-		if (
-			! empty( $_POST['slide_upcoming_productions_categories'] ) &&
-			! empty( $_POST['slide_upcoming_productions_categories'][0] )
-		) {
-			$slide_upcoming_productions_categories = array_map( 'intval', $_POST['slide_upcoming_productions_categories'] );
-		}
+                $slide_upcoming_productions_categories = '';
+                if (
+                        ! empty( $_POST['slide_upcoming_productions_categories'] ) &&
+                        ! empty( $_POST['slide_upcoming_productions_categories'][0] )
+                ) {
+                        $slide_upcoming_productions_categories = array_map( 'intval', (array) wp_unslash( $_POST['slide_upcoming_productions_categories'] ) );
+                }
 
 		update_post_meta( $post_id, 'slide_upcoming_productions_limit', $slide_upcoming_productions_limit );
 		update_post_meta( $post_id, 'slide_upcoming_productions_categories', $slide_upcoming_productions_categories );

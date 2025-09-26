@@ -45,11 +45,12 @@
 	 * @return 	void
 	 */
 	function save_orientation_choice( orientation ) {
-		var data = {
-			'action': 'recspectra_preview_save_orientation_choice',
-			'orientation': orientation,
-			'object_id' : recspectra_preview.object_id,
-		};
+                var data = {
+                        'action': 'recspectra_preview_save_orientation_choice',
+                        'orientation': orientation,
+                        'object_id' : recspectra_preview.object_id,
+                        'nonce': recspectra_preview.nonce,
+                };
 		jQuery.post(recspectra_preview.ajax_url, data );
 	}
 })( jQuery );

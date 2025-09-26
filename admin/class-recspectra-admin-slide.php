@@ -95,10 +95,16 @@ class Recspectra_Admin_Slide {
 	 *
 	 */
 	static function localize_scripts() {
-		$slide_file_defaults = array(
-			'image' => array(
-				'text_select' => esc_html__( 'Select an image', 'recspectra' ),
-				'text_use' => esc_html__( 'Use this image', 'recspectra' ),
+                $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+
+                if ( empty( $screen ) || Recspectra_Slide::post_type_name !== $screen->post_type ) {
+                        return;
+                }
+
+                $slide_file_defaults = array(
+                        'image' => array(
+                                'text_select' => esc_html__( 'Select an image', 'recspectra' ),
+                                'text_use' => esc_html__( 'Use this image', 'recspectra' ),
 			),
 			'application/pdf' => array(
 				'text_select' => esc_html__( 'Select a PDF', 'recspectra' ),
@@ -159,11 +165,11 @@ class Recspectra_Admin_Slide {
 		 */
 
 		/* Check if our nonce is set */
-		if ( ! isset( $_POST[Recspectra_Slide::post_type_name.'_nonce'] ) ) {
-			return $post_id;
-		}
+                if ( ! isset( $_POST[Recspectra_Slide::post_type_name.'_nonce'] ) ) {
+                        return $post_id;
+                }
 
-		$nonce = $_POST[Recspectra_Slide::post_type_name.'_nonce'];
+                $nonce = sanitize_text_field( wp_unslash( $_POST[Recspectra_Slide::post_type_name.'_nonce'] ) );
 
 		/* Verify that the nonce is valid */
 		if ( ! wp_verify_nonce( $nonce, Recspectra_Slide::post_type_name ) ) {
@@ -185,11 +191,11 @@ class Recspectra_Admin_Slide {
 		}
 
 		/* Slide format */
-		$slide_format_slug = sanitize_title( $_POST['slide_format'] );
+                $slide_format_slug = sanitize_title( wp_unslash( $_POST['slide_format'] ) );
 		$slide_format = Recspectra_Slides::get_slide_format_by_slug( $slide_format_slug );
 
 		/* Slide background */
-		$slide_background_slug = sanitize_title( $_POST['slide_background'] );
+                $slide_background_slug = sanitize_title( wp_unslash( $_POST['slide_background'] ) );
 		$slide_background = Recspectra_Slides::get_slide_background_by_slug_for_slide_format( $slide_background_slug, $slide_format_slug );
 
 		if ( empty( $slide_format ) || empty( $slide_background ) ) {

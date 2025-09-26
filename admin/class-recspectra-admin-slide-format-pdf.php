@@ -222,10 +222,10 @@ class Recspectra_Admin_Slide_Format_PDF {
 	 * @return	void
 	 */
 	static function save_slide_pdf( $post_id ) {
-		$slide_pdf_file = intval( $_POST['slide_pdf_file'] );
-		if ( empty( $slide_pdf_file ) ) {
-			$slide_pdf_file = '';
-		}
+                $slide_pdf_file = isset( $_POST['slide_pdf_file'] ) ? intval( wp_unslash( $_POST['slide_pdf_file'] ) ) : 0;
+                if ( empty( $slide_pdf_file ) ) {
+                        $slide_pdf_file = '';
+                }
 
 		if ( empty( $slide_pdf_file ) ) {
 			delete_post_meta( $post_id, 'slide_pdf_file' );

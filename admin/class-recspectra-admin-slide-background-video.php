@@ -24,33 +24,42 @@ class Recspectra_Admin_Slide_Background_Video {
 	 * @return	void
 	 */
 	static function save_slide_background( $post_id ) {
-		$slide_bg_video_video_url = sanitize_text_field( $_POST['slide_bg_video_video_url'] );
+                $slide_bg_video_video_url = '';
+                if ( isset( $_POST['slide_bg_video_video_url'] ) ) {
+                        $slide_bg_video_video_url = sanitize_text_field( wp_unslash( $_POST['slide_bg_video_video_url'] ) );
+                }
 
-		$slide_bg_video_video_start = intval( $_POST['slide_bg_video_video_start'] );
-		if ( empty( $slide_bg_video_video_start ) ) {
-			$slide_bg_video_video_start = '';
-		}
+                $slide_bg_video_video_start = '';
+                if ( isset( $_POST['slide_bg_video_video_start'] ) ) {
+                        $slide_bg_video_video_start = intval( wp_unslash( $_POST['slide_bg_video_video_start'] ) );
+                        if ( empty( $slide_bg_video_video_start ) ) {
+                                $slide_bg_video_video_start = '';
+                        }
+                }
 
-		$slide_bg_video_video_end = intval( $_POST['slide_bg_video_video_end'] );
-		if ( empty( $slide_bg_video_video_end ) ) {
-			$slide_bg_video_video_end = '';
-		}
+                $slide_bg_video_video_end = '';
+                if ( isset( $_POST['slide_bg_video_video_end'] ) ) {
+                        $slide_bg_video_video_end = intval( wp_unslash( $_POST['slide_bg_video_video_end'] ) );
+                        if ( empty( $slide_bg_video_video_end ) ) {
+                                $slide_bg_video_video_end = '';
+                        }
+                }
 
-		$slide_bg_video_hold_slide = '';
-		if ( isset( $_POST['slide_bg_video_hold_slide'] ) ) {
-			$slide_bg_video_hold_slide = intval( $_POST['slide_bg_video_hold_slide'] );
-			if ( empty( $slide_bg_video_hold_slide ) ) {
-				$slide_bg_video_hold_slide = '';
-			}
-		}
+                $slide_bg_video_hold_slide = '';
+                if ( isset( $_POST['slide_bg_video_hold_slide'] ) ) {
+                        $slide_bg_video_hold_slide = intval( wp_unslash( $_POST['slide_bg_video_hold_slide'] ) );
+                        if ( empty( $slide_bg_video_hold_slide ) ) {
+                                $slide_bg_video_hold_slide = '';
+                        }
+                }
 
-		$slide_bg_video_enable_sound = '';
-		if ( isset( $_POST['slide_bg_video_enable_sound'] ) ) {
-			$slide_bg_video_enable_sound = intval( $_POST['slide_bg_video_enable_sound'] );
-			if ( empty( $slide_bg_video_enable_sound ) ) {
-				$slide_bg_video_enable_sound = '';
-			}
-		}
+                $slide_bg_video_enable_sound = '';
+                if ( isset( $_POST['slide_bg_video_enable_sound'] ) ) {
+                        $slide_bg_video_enable_sound = intval( wp_unslash( $_POST['slide_bg_video_enable_sound'] ) );
+                        if ( empty( $slide_bg_video_enable_sound ) ) {
+                                $slide_bg_video_enable_sound = '';
+                        }
+                }
 
 		update_post_meta( $post_id, 'slide_bg_video_video_url', $slide_bg_video_video_url );
 		update_post_meta( $post_id, 'slide_bg_video_video_start', $slide_bg_video_video_start );
