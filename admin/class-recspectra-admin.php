@@ -101,6 +101,12 @@ class Recspectra_Admin {
 
                 wp_register_script( Recspectra::get_plugin_name() . '-admin', plugin_dir_url( __FILE__ ) . 'js/recspectra-admin-min.js', array( 'jquery', 'jquery-ui-sortable' ), Recspectra::get_version(), true );
                 wp_enqueue_script( Recspectra::get_plugin_name() . '-admin' );
+
+                $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+
+                if ( ! empty( $screen ) && Recspectra_Display::post_type_name === $screen->post_type ) {
+                        wp_enqueue_script( Recspectra::get_plugin_name() . '-display-schedule', plugin_dir_url( __FILE__ ) . 'js/recspectra-display-schedule.js', array( 'jquery' ), Recspectra::get_version(), true );
+                }
         }
 
 	/**

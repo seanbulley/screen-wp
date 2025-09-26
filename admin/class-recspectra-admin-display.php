@@ -56,16 +56,16 @@ class Recspectra_Admin_Display {
 	 * @since	1.0.0
 	 * @since	1.3.2	Changed method to static.
 	 */
-	static function add_channel_scheduler_meta_box() {
-		add_meta_box(
-			'recspectra_channel_scheduler',
-			__( 'Schedule temporary channel' , 'recspectra' ),
-			array( __CLASS__, 'channel_scheduler_meta_box' ),
-			Recspectra_Display::post_type_name,
-			'normal',
-			'high'
-		);
-	}
+        static function add_channel_scheduler_meta_box() {
+                add_meta_box(
+                        'recspectra_channel_scheduler',
+                        __( 'Channel schedule' , 'recspectra' ),
+                        array( __CLASS__, 'channel_scheduler_meta_box' ),
+                        Recspectra_Display::post_type_name,
+                        'normal',
+                        'high'
+                );
+        }
 
 	/**
 	 * Outputs the content of the channel editor meta box.
@@ -283,70 +283,141 @@ class Recspectra_Admin_Display {
 	 * @param	WP_Post	$post
 	 * @return	string	$html	The HTML that lists the scheduled channels in the channel scheduler.
 	 */
-	static function get_scheduled_channel_html( $post ) {
+        static function get_scheduled_channel_html( $post ) {
 
-		$display = new Recspectra_Display( $post );
-		$schedule = $display->get_schedule();
+                $display  = new Recspectra_Display( $post );
+                $schedule = $display->get_schedule();
+                $channels = Recspectra_Channels::get_posts();
 
-		if ( !empty( $schedule ) ) {
-			$scheduled_channel = $schedule[0];
-		}
+                if ( empty( $schedule ) ) {
+                        $schedule = array(
+                                array(
+                                        'channel'    => '',
+                                        'priority'   => 0,
+                                        'date_start' => '',
+                                        'date_end'   => '',
+                                        'time_start' => '',
+                                        'time_end'   => '',
+                                        'days'       => array(),
+                                ),
+                        );
+                }
 
-		$channel_scheduler_defaults = self::get_channel_scheduler_defaults();
+                ob_start();
 
-		ob_start();
+                ?>
+                        <tr>
+                                <th><?php echo esc_html__( 'Schedules', 'recspectra' ); ?></th>
+                                <td>
+                                        <table class="recspectra-channel-schedule-table widefat">
+                                                <thead>
+                                                        <tr>
+                                                                <th><?php echo esc_html__( 'Channel', 'recspectra' ); ?></th>
+                                                                <th><?php echo esc_html__( 'Priority', 'recspectra' ); ?></th>
+                                                                <th><?php echo esc_html__( 'Date range', 'recspectra' ); ?></th>
+                                                                <th><?php echo esc_html__( 'Time window', 'recspectra' ); ?></th>
+                                                                <th><?php echo esc_html__( 'Days of week', 'recspectra' ); ?></th>
+                                                                <th class="recspectra-channel-schedule-actions">&nbsp;</th>
+                                                        </tr>
+                                                </thead>
+                                                <tbody class="recspectra-channel-schedule-rows">
+                                                        <?php
+                                                        foreach ( $schedule as $index => $rule ) {
+                                                                echo self::render_schedule_row( $index, $rule, $channels );
+                                                        }
+                                                        ?>
+                                                </tbody>
+                                        </table>
+                                        <p>
+                                                <button type="button" class="button button-secondary recspectra-add-schedule-row"><?php echo esc_html__( 'Add schedule', 'recspectra' ); ?></button>
+                                        </p>
+                                        <script type="text/html" id="recspectra-channel-schedule-row-template">
+                                                <?php echo self::render_schedule_row( '__INDEX__', array( 'channel' => '', 'priority' => 0, 'date_start' => '', 'date_end' => '', 'time_start' => '', 'time_end' => '', 'days' => array() ), $channels, true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                                        </script>
+                                </td>
+                        </tr>
+                <?php
 
-		?>
-			<tr>
-				<th>
-					<label for="recspectra_channel_editor_scheduled_channel">
-						<?php echo esc_html__( 'Temporary channel', 'recspectra' ); ?>
-					</label>
-				</th>
-				<td>
-					<select id="recspectra_channel_editor_scheduled_channel" name="recspectra_channel_editor_scheduled_channel">
-						<option value="">(<?php echo esc_html__( 'Select a channel', 'recspectra' ); ?>)</option>
-						<?php
-							$channels = Recspectra_Channels::get_posts();
-							foreach ( $channels as $channel ) {
-								$checked = '';
-								if ( ! empty( $scheduled_channel['channel'] ) && $scheduled_channel['channel'] == $channel->ID ) {
-									$checked = 'selected="selected"';
-								}
-							?>
-								<option value="<?php echo intval( $channel->ID ); ?>" <?php echo $checked; ?>><?php echo esc_html( $channel->post_title ); ?></option>
-							<?php
-							}
-						?>
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<th>
-					<label for="recspectra_channel_editor_scheduled_channel_start">
-						<?php echo esc_html__( 'Show from', 'recspectra' ); ?>
-					</label>
-				</th>
-				<td>
-					<input type="text" id="recspectra_channel_editor_scheduled_channel_start" name="recspectra_channel_editor_scheduled_channel_start" value="<?php if ( ! empty( $scheduled_channel['start'] ) ) { echo esc_html( date_i18n( $channel_scheduler_defaults['datetime_format'], $scheduled_channel['start'] + get_option( 'gmt_offset' ) * HOUR_IN_SECONDS, true ) ); } ?>" />
-				</td>
-			</tr>
-			<tr>
-				<th>
-					<label for="recspectra_channel_editor_scheduled_channel_end">
-						<?php echo esc_html__( 'Until', 'recspectra' ); ?>
-					</label>
-				</th>
-				<td>
-					<input type="text" id="recspectra_channel_editor_scheduled_channel_end" name="recspectra_channel_editor_scheduled_channel_end" value="<?php if ( ! empty( $scheduled_channel['end'] ) ) { echo esc_html( date_i18n( $channel_scheduler_defaults['datetime_format'], $scheduled_channel['end'] + get_option( 'gmt_offset' ) * HOUR_IN_SECONDS, true ) ); } ?>" />
-				</td>
-			</tr>
-		<?php
+                $html = ob_get_clean();
 
-		$html = ob_get_clean();
+                return $html;
+        }
 
-		return $html;
-	}
+        private static function render_schedule_row( $index, $rule, $channels, $is_template = false ) {
+
+                $index_attr = $is_template ? '__INDEX__' : intval( $index );
+
+                $channel_id = isset( $rule['channel'] ) ? intval( $rule['channel'] ) : 0;
+                $priority   = isset( $rule['priority'] ) ? intval( $rule['priority'] ) : 0;
+                $date_start = isset( $rule['date_start'] ) ? $rule['date_start'] : '';
+                $date_end   = isset( $rule['date_end'] ) ? $rule['date_end'] : '';
+                $time_start = isset( $rule['time_start'] ) ? $rule['time_start'] : '';
+                $time_end   = isset( $rule['time_end'] ) ? $rule['time_end'] : '';
+                $days       = isset( $rule['days'] ) && is_array( $rule['days'] ) ? array_map( 'intval', $rule['days'] ) : array();
+
+                $days_of_week = array(
+                        0 => esc_html__( 'Sunday', 'recspectra' ),
+                        1 => esc_html__( 'Monday', 'recspectra' ),
+                        2 => esc_html__( 'Tuesday', 'recspectra' ),
+                        3 => esc_html__( 'Wednesday', 'recspectra' ),
+                        4 => esc_html__( 'Thursday', 'recspectra' ),
+                        5 => esc_html__( 'Friday', 'recspectra' ),
+                        6 => esc_html__( 'Saturday', 'recspectra' ),
+                );
+
+                ob_start();
+
+                ?>
+                <tr class="recspectra-channel-schedule-row" data-index="<?php echo esc_attr( $index_attr ); ?>">
+                        <td>
+                                <select name="recspectra_channel_schedule[<?php echo esc_attr( $index_attr ); ?>][channel]">
+                                        <option value="">(<?php echo esc_html__( 'Select a channel', 'recspectra' ); ?>)</option>
+                                        <?php foreach ( $channels as $channel ) : ?>
+                                                <option value="<?php echo intval( $channel->ID ); ?>" <?php selected( $channel_id, $channel->ID ); ?>><?php echo esc_html( get_the_title( $channel->ID ) ); ?></option>
+                                        <?php endforeach; ?>
+                                </select>
+                        </td>
+                        <td>
+                                <input type="number" class="small-text" name="recspectra_channel_schedule[<?php echo esc_attr( $index_attr ); ?>][priority]" value="<?php echo esc_attr( $priority ); ?>" />
+                        </td>
+                        <td>
+                                <label>
+                                        <span class="screen-reader-text"><?php echo esc_html__( 'Start date', 'recspectra' ); ?></span>
+                                        <input type="date" name="recspectra_channel_schedule[<?php echo esc_attr( $index_attr ); ?>][date_start]" value="<?php echo esc_attr( $date_start ); ?>" />
+                                </label>
+                                <label>
+                                        <span class="screen-reader-text"><?php echo esc_html__( 'End date', 'recspectra' ); ?></span>
+                                        <input type="date" name="recspectra_channel_schedule[<?php echo esc_attr( $index_attr ); ?>][date_end]" value="<?php echo esc_attr( $date_end ); ?>" />
+                                </label>
+                        </td>
+                        <td>
+                                <label>
+                                        <span class="screen-reader-text"><?php echo esc_html__( 'Start time', 'recspectra' ); ?></span>
+                                        <input type="time" name="recspectra_channel_schedule[<?php echo esc_attr( $index_attr ); ?>][time_start]" value="<?php echo esc_attr( $time_start ); ?>" />
+                                </label>
+                                <label>
+                                        <span class="screen-reader-text"><?php echo esc_html__( 'End time', 'recspectra' ); ?></span>
+                                        <input type="time" name="recspectra_channel_schedule[<?php echo esc_attr( $index_attr ); ?>][time_end]" value="<?php echo esc_attr( $time_end ); ?>" />
+                                </label>
+                        </td>
+                        <td class="recspectra-channel-schedule-days">
+                                <?php foreach ( $days_of_week as $day_index => $day_label ) : ?>
+                                        <label>
+                                                <input type="checkbox" value="<?php echo esc_attr( $day_index ); ?>" name="recspectra_channel_schedule[<?php echo esc_attr( $index_attr ); ?>][days][]" <?php checked( in_array( $day_index, $days, true ), true ); ?> />
+                                                <span><?php echo esc_html( $day_label ); ?></span>
+                                        </label>
+                                <?php endforeach; ?>
+                        </td>
+                        <td class="recspectra-channel-schedule-actions">
+                                <button type="button" class="button-link delete recspectra-remove-schedule-row">
+                                        <?php echo esc_html__( 'Remove', 'recspectra' ); ?>
+                                </button>
+                        </td>
+                </tr>
+                <?php
+
+                return ob_get_clean();
+        }
 
 	/**
 	 * Localizes the JavaScript for the display admin area.
@@ -453,52 +524,89 @@ class Recspectra_Admin_Display {
 
 		delete_post_meta( $display_id, 'recspectra_display_schedule' );
 
-                if ( ! isset( $_POST['recspectra_channel_editor_scheduled_channel'] ) ) {
-                        return;
-                }
-
-                $recspectra_channel_editor_scheduled_channel = intval( wp_unslash( $_POST['recspectra_channel_editor_scheduled_channel'] ) );
-                if ( empty( $recspectra_channel_editor_scheduled_channel ) ) {
-                        return;
-                }
-
-                if ( ! isset( $_POST['recspectra_channel_editor_scheduled_channel_start'], $_POST['recspectra_channel_editor_scheduled_channel_end'] ) ) {
-                        return;
-                }
-
-                $recspectra_channel_editor_scheduled_channel_start = sanitize_text_field( wp_unslash( $_POST['recspectra_channel_editor_scheduled_channel_start'] ) );
-                if ( empty( $recspectra_channel_editor_scheduled_channel_start ) ) {
-                        return;
-                }
-
-                $recspectra_channel_editor_scheduled_channel_end = sanitize_text_field( wp_unslash( $_POST['recspectra_channel_editor_scheduled_channel_end'] ) );
-                if ( empty( $recspectra_channel_editor_scheduled_channel_end ) ) {
-                        return;
-                }
-
-		/**
-		 * Store all scheduled channels.
-		 * Currently only one scheduled channel is saved.
-		 *
-		 * Makes sure that start and end times are stored in UTC.
-		 * Makes sure end time never equals or is before the start time.
-		 */
-
-		$start = strtotime( $recspectra_channel_editor_scheduled_channel_start ) - get_option( 'gmt_offset' ) * HOUR_IN_SECONDS;
-		$end = strtotime( $recspectra_channel_editor_scheduled_channel_end ) - get_option( 'gmt_offset' ) * HOUR_IN_SECONDS;
-
-		if ( $end <= $start ) {
-			// End time is invalid, set based on start time and default duration
-			$channel_scheduler_defaults = self::get_channel_scheduler_defaults();
-			$end = $start + $channel_scheduler_defaults['duration'];
+		if ( ! isset( $_POST['recspectra_channel_schedule'] ) || ! is_array( $_POST['recspectra_channel_schedule'] ) ) {
+			return;
 		}
 
-		$schedule = array(
-			'channel' => $recspectra_channel_editor_scheduled_channel,
-			'start' => 	$start,
-			'end' => $end,
-		);
+		$submitted_schedule = wp_unslash( $_POST['recspectra_channel_schedule'] );
+		$sanitized_schedule = array();
 
-		add_post_meta( $display_id, 'recspectra_display_schedule', $schedule, false );
+		foreach ( $submitted_schedule as $rule ) {
+			if ( ! is_array( $rule ) ) {
+				continue;
+			}
+
+			$channel_id = isset( $rule['channel'] ) ? intval( $rule['channel'] ) : 0;
+
+			if ( empty( $channel_id ) ) {
+				continue;
+			}
+
+			$priority	 = isset( $rule['priority'] ) ? intval( $rule['priority'] ) : 0;
+			$date_start = self::sanitize_date( isset( $rule['date_start'] ) ? $rule['date_start'] : '' );
+			$date_end	 = self::sanitize_date( isset( $rule['date_end'] ) ? $rule['date_end'] : '' );
+			$time_start = self::sanitize_time( isset( $rule['time_start'] ) ? $rule['time_start'] : '' );
+			$time_end	 = self::sanitize_time( isset( $rule['time_end'] ) ? $rule['time_end'] : '' );
+
+			$days = array();
+			if ( isset( $rule['days'] ) && is_array( $rule['days'] ) ) {
+				foreach ( $rule['days'] as $day ) {
+					$day = intval( $day );
+					if ( $day >= 0 && $day <= 6 ) {
+						$days[] = $day;
+					}
+				}
+			}
+
+			$days = array_values( array_unique( $days ) );
+
+			$sanitized_schedule[] = array(
+				'channel'	 => $channel_id,
+				'priority'	=> $priority,
+				'date_start' => $date_start,
+				'date_end'	 => $date_end,
+				'time_start' => $time_start,
+				'time_end'	 => $time_end,
+				'days'	 => $days,
+			);
+		}
+
+		if ( empty( $sanitized_schedule ) ) {
+			return;
+		}
+
+		update_post_meta( $display_id, 'recspectra_display_schedule', $sanitized_schedule );
+	}
+
+	private static function sanitize_date( $value ) {
+		$value = sanitize_text_field( $value );
+
+		if ( empty( $value ) ) {
+			return '';
+		}
+
+		$date = DateTimeImmutable::createFromFormat( 'Y-m-d', $value );
+
+		if ( ! $date ) {
+			return '';
+		}
+
+		return $date->format( 'Y-m-d' );
+	}
+
+	private static function sanitize_time( $value ) {
+		$value = sanitize_text_field( $value );
+
+		if ( empty( $value ) ) {
+			return '';
+		}
+
+		$time = DateTimeImmutable::createFromFormat( 'H:i', $value );
+
+		if ( ! $time ) {
+			return '';
+		}
+
+		return $time->format( 'H:i' );
 	}
 }

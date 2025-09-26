@@ -36,10 +36,8 @@ class Test_Recspectra_Admin_Display extends Recspectra_UnitTestCase {
 
 		$_POST[ Recspectra_Display::post_type_name.'_nonce' ] = wp_create_nonce( Recspectra_Display::post_type_name );
 		$_POST['recspectra_channel_editor_' . Recspectra_Display::post_type_name] = $this->display1;
-		$_POST['recspectra_channel_editor_default_channel'] = $default_channel;
-		$_POST['recspectra_channel_editor_scheduled_channel'] = '';
-		$_POST['recspectra_channel_editor_scheduled_channel_start'] = '';
-		$_POST['recspectra_channel_editor_scheduled_channel_end'] = '';
+                $_POST['recspectra_channel_editor_default_channel'] = $default_channel;
+                $_POST['recspectra_channel_schedule'] = array();
 
 		Recspectra_Admin_Display::save_display( $this->display1 );
 
@@ -53,30 +51,44 @@ class Test_Recspectra_Admin_Display extends Recspectra_UnitTestCase {
 
 		$this->assume_role( 'administrator' );
 
-		$scheduled_channel = $this->channel1;
-		$schedule_start = date( 'Y-m-d H:i', strtotime( '-10 minutes' ) );
-		$schedule_end = date( 'Y-m-d H:i', strtotime( '+10 minutes' ) );
-		$schedule_start_timestamp = strtotime( $schedule_start );
-		$schedule_end_timestamp = strtotime( $schedule_end );
+                $scheduled_channel = $this->channel1;
+                $schedule_priority = 5;
+                $schedule_start_date = gmdate( 'Y-m-d', strtotime( '-1 day' ) );
+                $schedule_end_date = gmdate( 'Y-m-d', strtotime( '+1 day' ) );
+                $schedule_start_time = '12:00';
+                $schedule_end_time = '16:00';
+                $schedule_days = array( '1', '5' );
 
-		$_POST[ Recspectra_Display::post_type_name.'_nonce' ] = wp_create_nonce( Recspectra_Display::post_type_name );
-		$_POST['recspectra_channel_editor_' . Recspectra_Display::post_type_name] = $this->display1;
-		$_POST['recspectra_channel_editor_default_channel'] = '';
-		$_POST['recspectra_channel_editor_scheduled_channel'] = $scheduled_channel;
-		$_POST['recspectra_channel_editor_scheduled_channel_start'] = $schedule_start;
-		$_POST['recspectra_channel_editor_scheduled_channel_end'] = $schedule_end;
+                $_POST[ Recspectra_Display::post_type_name.'_nonce' ] = wp_create_nonce( Recspectra_Display::post_type_name );
+                $_POST['recspectra_channel_editor_' . Recspectra_Display::post_type_name] = $this->display1;
+                $_POST['recspectra_channel_editor_default_channel'] = '';
+                $_POST['recspectra_channel_schedule'] = array(
+                        array(
+                                'channel'    => $scheduled_channel,
+                                'priority'   => $schedule_priority,
+                                'date_start' => $schedule_start_date,
+                                'date_end'   => $schedule_end_date,
+                                'time_start' => $schedule_start_time,
+                                'time_end'   => $schedule_end_time,
+                                'days'       => $schedule_days,
+                        ),
+                );
 
-		Recspectra_Admin_Display::save_display( $this->display1 );
+                Recspectra_Admin_Display::save_display( $this->display1 );
 
-		$updated_display = new Recspectra_Display( $this->display1 );
+                $updated_display = new Recspectra_Display( $this->display1 );
 
-		$actual = $updated_display->get_schedule();
-		$actual = $actual[0]['channel'];
-		$this->assertEquals( $scheduled_channel, $actual );
+                $schedule = $updated_display->get_schedule();
+                $this->assertCount( 1, $schedule );
 
-		$actual = $updated_display->get_schedule();
-		$actual = $actual[0]['start'];
-		$this->assertEquals( $schedule_start_timestamp, $actual );
+                $actual = $schedule[0];
+                $this->assertEquals( $scheduled_channel, $actual['channel'] );
+                $this->assertEquals( $schedule_priority, $actual['priority'] );
+                $this->assertEquals( $schedule_start_date, $actual['date_start'] );
+                $this->assertEquals( $schedule_end_date, $actual['date_end'] );
+                $this->assertEquals( $schedule_start_time, $actual['time_start'] );
+                $this->assertEquals( $schedule_end_time, $actual['time_end'] );
+                $this->assertEquals( array( 1, 5 ), $actual['days'] );
 	}
 
 	function test_is_default_channel_column_empty_when_no_default_channel() {

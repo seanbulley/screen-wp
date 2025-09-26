@@ -23,11 +23,17 @@ class Test_Recspectra_Display extends Recspectra_UnitTestCase {
 		add_post_meta( $display_id, Recspectra_Channel::post_type_name, $channel_id );
 
 		$schedule = array(
-			'channel' => false,
-			'start' => 	strtotime( '-1 day' ),
-			'end' => strtotime( '+1 day' ),
+			array(
+				'channel'    => 0,
+				'priority'   => 0,
+				'date_start' => '',
+				'date_end'   => '',
+				'time_start' => '',
+				'time_end'   => '',
+				'days'       => array(),
+			),
 		);
-		add_post_meta( $display_id, 'recspectra_display_schedule', $schedule, false );
+		update_post_meta( $display_id, 'recspectra_display_schedule', $schedule );
 
 		$display = new Recspectra_Display( $display_id );
 
@@ -62,11 +68,17 @@ class Test_Recspectra_Display extends Recspectra_UnitTestCase {
 		add_post_meta( $display_id, Recspectra_Channel::post_type_name, $channel_1_id );
 
 		$schedule = array(
-			'channel' => $channel_2_id,
-			'start' => 	strtotime( '-1 day' ),
-			'end' => strtotime( '+1 day' ),
+			array(
+				'channel'    => $channel_2_id,
+				'priority'   => 0,
+				'date_start' => '',
+				'date_end'   => '',
+				'time_start' => '',
+				'time_end'   => '',
+				'days'       => array(),
+			),
 		);
-		add_post_meta( $display_id, 'recspectra_display_schedule', $schedule, false );
+		update_post_meta( $display_id, 'recspectra_display_schedule', $schedule );
 
 		$display = new Recspectra_Display( $display_id );
 
@@ -94,11 +106,17 @@ class Test_Recspectra_Display extends Recspectra_UnitTestCase {
 		add_post_meta( $display_id, Recspectra_Channel::post_type_name, $channel_1_id );
 
 		$schedule = array(
-			'channel' => $channel_2_id,
-			'start' => 	strtotime( '-1 day' ),
-			'end' => strtotime( '+1 day' ),
+			array(
+				'channel'    => $channel_2_id,
+				'priority'   => 0,
+				'date_start' => '',
+				'date_end'   => '',
+				'time_start' => '',
+				'time_end'   => '',
+				'days'       => array(),
+			),
 		);
-		add_post_meta( $display_id, 'recspectra_display_schedule', $schedule, false );
+		update_post_meta( $display_id, 'recspectra_display_schedule', $schedule );
 
 		$display = new Recspectra_Display( $display_id );
 
@@ -132,11 +150,11 @@ class Test_Recspectra_Display extends Recspectra_UnitTestCase {
 		$this->assertEquals( false, $actual );
 	}
 
-	function test_is_default_channel_returned_when_channel_is_published() {
+        function test_is_default_channel_returned_when_channel_is_published() {
 
-		/* Create published channel */
-		$channel_args = array(
-			'post_type' => Recspectra_Channel::post_type_name,
+                /* Create published channel */
+                $channel_args = array(
+                        'post_type' => Recspectra_Channel::post_type_name,
 		);
 
 		$channel_id = $this->factory->post->create( $channel_args );
@@ -149,12 +167,127 @@ class Test_Recspectra_Display extends Recspectra_UnitTestCase {
 		$display_id = $this->factory->post->create( $display_args );
 		add_post_meta( $display_id, Recspectra_Channel::post_type_name, $channel_id );
 
-		$display = new Recspectra_Display( $display_id );
+                $display = new Recspectra_Display( $display_id );
 
-		$actual = $display->get_active_channel();
+                $actual = $display->get_active_channel();
 
-		$this->assertEquals( $channel_id, $actual );
-	}
+                $this->assertEquals( $channel_id, $actual );
+        }
+
+        function test_highest_priority_channel_is_returned() {
+
+                $this->assume_role( 'administrator' );
+
+                $channel_args = array(
+                        'post_type' => Recspectra_Channel::post_type_name,
+                );
+
+                $low_priority_channel = $this->factory->post->create( $channel_args );
+                $high_priority_channel = $this->factory->post->create( $channel_args );
+
+                $display_args = array(
+                        'post_type' => Recspectra_Display::post_type_name,
+                );
+
+                $display_id = $this->factory->post->create( $display_args );
+
+                $_POST[ Recspectra_Display::post_type_name.'_nonce' ] = wp_create_nonce( Recspectra_Display::post_type_name );
+                $_POST['recspectra_channel_editor_' . Recspectra_Display::post_type_name] = $display_id;
+                $_POST['recspectra_channel_editor_default_channel'] = $low_priority_channel;
+
+                $schedule = array(
+                        array(
+                                'channel'    => $low_priority_channel,
+                                'priority'   => 1,
+                                'date_start' => '',
+                                'date_end'   => '',
+                                'time_start' => '',
+                                'time_end'   => '',
+                                'days'       => array(),
+                        ),
+                        array(
+                                'channel'    => $high_priority_channel,
+                                'priority'   => 10,
+                                'date_start' => '',
+                                'date_end'   => '',
+                                'time_start' => '',
+                                'time_end'   => '',
+                                'days'       => array(),
+                        ),
+                );
+
+                $_POST['recspectra_channel_schedule'] = $schedule;
+
+                Recspectra_Admin_Display::save_display( $display_id );
+
+                $display = new Recspectra_Display( $display_id );
+
+                $this->assertEquals( $high_priority_channel, $display->get_active_channel() );
+        }
+
+        function test_schedule_respects_days_of_week() {
+
+                $this->assume_role( 'administrator' );
+
+                $channel_args = array(
+                        'post_type' => Recspectra_Channel::post_type_name,
+                );
+
+                $default_channel = $this->factory->post->create( $channel_args );
+                $scheduled_channel = $this->factory->post->create( $channel_args );
+
+                $display_args = array(
+                        'post_type' => Recspectra_Display::post_type_name,
+                );
+
+                $display_id = $this->factory->post->create( $display_args );
+
+                $_POST[ Recspectra_Display::post_type_name.'_nonce' ] = wp_create_nonce( Recspectra_Display::post_type_name );
+                $_POST['recspectra_channel_editor_' . Recspectra_Display::post_type_name] = $display_id;
+                $_POST['recspectra_channel_editor_default_channel'] = $default_channel;
+
+                $now = current_time( 'timestamp' );
+                $current_day = intval( wp_date( 'w', $now ) );
+                $current_date = wp_date( 'Y-m-d', $now );
+                $time_start = wp_date( 'H:i', $now - 5 * MINUTE_IN_SECONDS );
+                $time_end = wp_date( 'H:i', $now + 5 * MINUTE_IN_SECONDS );
+
+                $_POST['recspectra_channel_schedule'] = array(
+                        array(
+                                'channel'    => $scheduled_channel,
+                                'priority'   => 5,
+                                'date_start' => $current_date,
+                                'date_end'   => $current_date,
+                                'time_start' => $time_start,
+                                'time_end'   => $time_end,
+                                'days'       => array( $current_day ),
+                        ),
+                );
+
+                Recspectra_Admin_Display::save_display( $display_id );
+
+                $display = new Recspectra_Display( $display_id );
+
+                $this->assertEquals( $scheduled_channel, $display->get_active_channel() );
+
+                $_POST['recspectra_channel_schedule'] = array(
+                        array(
+                                'channel'    => $scheduled_channel,
+                                'priority'   => 5,
+                                'date_start' => $current_date,
+                                'date_end'   => $current_date,
+                                'time_start' => $time_start,
+                                'time_end'   => $time_end,
+                                'days'       => array( ( $current_day + 1 ) % 7 ),
+                        ),
+                );
+
+                Recspectra_Admin_Display::save_display( $display_id );
+
+                $display = new Recspectra_Display( $display_id );
+
+                $this->assertEquals( $default_channel, $display->get_active_channel() );
+        }
 
 	function test_is_scheduled_channel_used_when_schedule_is_now() {
 
@@ -177,15 +310,25 @@ class Test_Recspectra_Display extends Recspectra_UnitTestCase {
 
 		$default_channel = $channel_1_id;
 		$scheduled_channel = $channel_2_id;
-		$schedule_start = date( 'Y-m-d H:i', strtotime( '-10 minutes' ) ); // Convert to UTC
-		$schedule_end = date( 'Y-m-d H:i', strtotime( '+10 minutes' ) ); // Convert to UTC
+                $now = current_time( 'timestamp' );
+                $schedule_date = wp_date( 'Y-m-d', $now );
+                $schedule_start = wp_date( 'H:i', $now - 10 * MINUTE_IN_SECONDS );
+                $schedule_end = wp_date( 'H:i', $now + 10 * MINUTE_IN_SECONDS );
 
-		$_POST[ Recspectra_Display::post_type_name.'_nonce' ] = wp_create_nonce( Recspectra_Display::post_type_name );
-		$_POST['recspectra_channel_editor_' . Recspectra_Display::post_type_name] = $display_id;
-		$_POST['recspectra_channel_editor_default_channel'] = $default_channel;
-		$_POST['recspectra_channel_editor_scheduled_channel'] = $scheduled_channel;
-		$_POST['recspectra_channel_editor_scheduled_channel_start'] = $schedule_start;
-		$_POST['recspectra_channel_editor_scheduled_channel_end'] = $schedule_end;
+                $_POST[ Recspectra_Display::post_type_name.'_nonce' ] = wp_create_nonce( Recspectra_Display::post_type_name );
+                $_POST['recspectra_channel_editor_' . Recspectra_Display::post_type_name] = $display_id;
+                $_POST['recspectra_channel_editor_default_channel'] = $default_channel;
+                $_POST['recspectra_channel_schedule'] = array(
+                        array(
+                                'channel'    => $scheduled_channel,
+                                'priority'   => 0,
+                                'date_start' => $schedule_date,
+                                'date_end'   => $schedule_date,
+                                'time_start' => $schedule_start,
+                                'time_end'   => $schedule_end,
+                                'days'       => array(),
+                        ),
+                );
 
 		Recspectra_Admin_Display::save_display( $display_id );
 
@@ -217,15 +360,25 @@ class Test_Recspectra_Display extends Recspectra_UnitTestCase {
 
 		$default_channel = $channel_1_id;
 		$scheduled_channel = $channel_2_id;
-		$schedule_start = date( 'Y-m-d H:i', strtotime( '+10 minutes' ) ); // Convert to UTC
-		$schedule_end = date( 'Y-m-d H:i', strtotime( '+20 minutes' ) ); // Convert to UTC
+                $now = current_time( 'timestamp' );
+                $schedule_date = wp_date( 'Y-m-d', $now );
+                $schedule_start = wp_date( 'H:i', $now + 10 * MINUTE_IN_SECONDS );
+                $schedule_end = wp_date( 'H:i', $now + 20 * MINUTE_IN_SECONDS );
 
-		$_POST[ Recspectra_Display::post_type_name.'_nonce' ] = wp_create_nonce( Recspectra_Display::post_type_name );
-		$_POST['recspectra_channel_editor_' . Recspectra_Display::post_type_name] = $display_id;
-		$_POST['recspectra_channel_editor_default_channel'] = $default_channel;
-		$_POST['recspectra_channel_editor_scheduled_channel'] = $scheduled_channel;
-		$_POST['recspectra_channel_editor_scheduled_channel_start'] = $schedule_start;
-		$_POST['recspectra_channel_editor_scheduled_channel_end'] = $schedule_end;
+                $_POST[ Recspectra_Display::post_type_name.'_nonce' ] = wp_create_nonce( Recspectra_Display::post_type_name );
+                $_POST['recspectra_channel_editor_' . Recspectra_Display::post_type_name] = $display_id;
+                $_POST['recspectra_channel_editor_default_channel'] = $default_channel;
+                $_POST['recspectra_channel_schedule'] = array(
+                        array(
+                                'channel'    => $scheduled_channel,
+                                'priority'   => 0,
+                                'date_start' => $schedule_date,
+                                'date_end'   => $schedule_date,
+                                'time_start' => $schedule_start,
+                                'time_end'   => $schedule_end,
+                                'days'       => array(),
+                        ),
+                );
 
 		Recspectra_Admin_Display::save_display( $display_id );
 
@@ -259,15 +412,25 @@ class Test_Recspectra_Display extends Recspectra_UnitTestCase {
 
 		$default_channel = $channel_1_id;
 		$scheduled_channel = $channel_2_id;
-		$schedule_start = date( 'Y-m-d H:i', strtotime( '-10 minutes' ) + $timezone_offset * HOUR_IN_SECONDS ); // Convert to UTC
-		$schedule_end = date( 'Y-m-d H:i', strtotime( '+10 minutes' ) + $timezone_offset * HOUR_IN_SECONDS ); // Convert to UTC
+                $now = current_time( 'timestamp' );
+                $schedule_date = wp_date( 'Y-m-d', $now );
+                $schedule_start = wp_date( 'H:i', $now - 10 * MINUTE_IN_SECONDS );
+                $schedule_end = wp_date( 'H:i', $now + 10 * MINUTE_IN_SECONDS );
 
 		$_POST[ Recspectra_Display::post_type_name.'_nonce' ] = wp_create_nonce( Recspectra_Display::post_type_name );
 		$_POST['recspectra_channel_editor_' . Recspectra_Display::post_type_name] = $display_id;
 		$_POST['recspectra_channel_editor_default_channel'] = $default_channel;
-		$_POST['recspectra_channel_editor_scheduled_channel'] = $scheduled_channel;
-		$_POST['recspectra_channel_editor_scheduled_channel_start'] = $schedule_start;
-		$_POST['recspectra_channel_editor_scheduled_channel_end'] = $schedule_end;
+                $_POST['recspectra_channel_schedule'] = array(
+                        array(
+                                'channel'    => $scheduled_channel,
+                                'priority'   => 0,
+                                'date_start' => $schedule_date,
+                                'date_end'   => $schedule_date,
+                                'time_start' => $schedule_start,
+                                'time_end'   => $schedule_end,
+                                'days'       => array(),
+                        ),
+                );
 
 		Recspectra_Admin_Display::save_display( $display_id );
 
@@ -301,15 +464,25 @@ class Test_Recspectra_Display extends Recspectra_UnitTestCase {
 
 		$default_channel = $channel_1_id;
 		$scheduled_channel = $channel_2_id;
-		$schedule_start = date( 'Y-m-d H:i', strtotime( '+10 minutes' ) + $timezone_offset * HOUR_IN_SECONDS ); // Convert to UTC
-		$schedule_end = date( 'Y-m-d H:i', strtotime( '+20 minutes' ) + $timezone_offset * HOUR_IN_SECONDS ); // Convert to UTC
+                $now = current_time( 'timestamp' );
+                $schedule_date = wp_date( 'Y-m-d', $now );
+                $schedule_start = wp_date( 'H:i', $now + 10 * MINUTE_IN_SECONDS );
+                $schedule_end = wp_date( 'H:i', $now + 20 * MINUTE_IN_SECONDS );
 
 		$_POST[ Recspectra_Display::post_type_name.'_nonce' ] = wp_create_nonce( Recspectra_Display::post_type_name );
 		$_POST['recspectra_channel_editor_' . Recspectra_Display::post_type_name] = $display_id;
 		$_POST['recspectra_channel_editor_default_channel'] = $default_channel;
-		$_POST['recspectra_channel_editor_scheduled_channel'] = $scheduled_channel;
-		$_POST['recspectra_channel_editor_scheduled_channel_start'] = $schedule_start;
-		$_POST['recspectra_channel_editor_scheduled_channel_end'] = $schedule_end;
+                $_POST['recspectra_channel_schedule'] = array(
+                        array(
+                                'channel'    => $scheduled_channel,
+                                'priority'   => 0,
+                                'date_start' => $schedule_date,
+                                'date_end'   => $schedule_date,
+                                'time_start' => $schedule_start,
+                                'time_end'   => $schedule_end,
+                                'days'       => array(),
+                        ),
+                );
 
 		Recspectra_Admin_Display::save_display( $display_id );
 

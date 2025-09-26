@@ -119,51 +119,54 @@ class Recspectra_Display {
 	 * @access	public
 	 * @return	Recspectra_Channel	The currently active channel for this display.
 	 */
-	public function get_active_channel() {
+        public function get_active_channel() {
 
-		if ( ! isset( $this->active_channel ) ) {
+                if ( ! isset( $this->active_channel ) ) {
 
-			$active_channel = $this->get_default_channel();
+                        $active_channel = $this->get_default_channel();
+                        $this->active_channel = $active_channel;
 
-			$this->active_channel = $active_channel;
+                        $schedule = $this->get_schedule();
 
-			/**
-			 * Check if a temporary channel is scheduled.
-			 */
-			$schedule = $this->get_schedule();
+                        if ( empty( $schedule ) ) {
+                                return $this->active_channel;
+                        }
 
-			// Nothing scheduled at all. Return the default channel.
-			if ( empty( $schedule ) ) {
-				return $this->active_channel;
-			}
+                        $matching_channels = array();
+                        $now               = $this->get_current_time();
 
-			// Return the first scheduled channel that matches the current time, has a channel set, and channel is published.
-			foreach ( $schedule as $scheduled_channel ) {
+                        foreach ( $schedule as $scheduled_channel ) {
 
-				if ( $scheduled_channel['start'] > time() ) {
-					continue;
-				}
+                                $channel_id = isset( $scheduled_channel['channel'] ) ? intval( $scheduled_channel['channel'] ) : 0;
 
-				if ( $scheduled_channel['end'] < time() ) {
-					continue;
-				}
+                                if ( empty( $channel_id ) ) {
+                                        continue;
+                                }
 
-				if ( empty( $scheduled_channel['channel'] ) ) {
-					continue;
-				}
+                                if ( 'publish' !== get_post_status( $channel_id ) ) {
+                                        continue;
+                                }
 
-				// Only use channel with post status 'publish'
-				if ( 'publish' != get_post_status( $scheduled_channel['channel'] ) ) {
-					continue;
-				}
+                                if ( ! $this->is_schedule_active( $scheduled_channel, $now ) ) {
+                                        continue;
+                                }
 
-				$this->active_channel = $scheduled_channel['channel'];
+                                $priority = isset( $scheduled_channel['priority'] ) ? intval( $scheduled_channel['priority'] ) : 0;
 
-			}
-		}
+                                $matching_channels[] = array(
+                                        'channel'  => $channel_id,
+                                        'priority' => $priority,
+                                );
+                        }
 
-		return $this->active_channel;
-	}
+                        if ( ! empty( $matching_channels ) ) {
+                                usort( $matching_channels, array( $this, 'sort_channels_by_priority' ) );
+                                $this->active_channel = $matching_channels[0]['channel'];
+                        }
+                }
+
+                return $this->active_channel;
+        }
 
 
 	/**
@@ -199,13 +202,199 @@ class Recspectra_Display {
 	 * @since	1.0.0
 	 * @return 	array|string	All scheduled channels or an empty string if no channels are scheduled.
 	 */
-	public function get_schedule() {
-		$schedule = array();
+        public function get_schedule() {
+                $schedule = get_post_meta( $this->ID, 'recspectra_display_schedule', true );
 
-		$schedule = get_post_meta( $this->ID, 'recspectra_display_schedule', false );
+                if ( empty( $schedule ) ) {
+                        $legacy_schedule = get_post_meta( $this->ID, 'recspectra_display_schedule', false );
 
-		return $schedule;
-	}
+                        if ( ! empty( $legacy_schedule ) ) {
+                                $schedule = array();
+
+                                foreach ( $legacy_schedule as $legacy_entry ) {
+                                        if ( ! is_array( $legacy_entry ) ) {
+                                                continue;
+                                        }
+
+                                        $start_datetime = isset( $legacy_entry['start'] ) ? $this->convert_timestamp_to_datetime( $legacy_entry['start'] ) : null;
+                                        $end_datetime   = isset( $legacy_entry['end'] ) ? $this->convert_timestamp_to_datetime( $legacy_entry['end'] ) : null;
+
+                                        $schedule[] = array(
+                                                'channel'    => isset( $legacy_entry['channel'] ) ? intval( $legacy_entry['channel'] ) : 0,
+                                                'priority'   => 0,
+                                                'date_start' => $start_datetime ? $start_datetime->format( 'Y-m-d' ) : '',
+                                                'date_end'   => $end_datetime ? $end_datetime->format( 'Y-m-d' ) : '',
+                                                'time_start' => $start_datetime ? $start_datetime->format( 'H:i' ) : '',
+                                                'time_end'   => $end_datetime ? $end_datetime->format( 'H:i' ) : '',
+                                                'days'       => array(),
+                                        );
+                                }
+                        }
+                }
+
+                if ( ! is_array( $schedule ) ) {
+                        return array();
+                }
+
+                $schedule = array_map( array( $this, 'normalize_schedule_entry' ), $schedule );
+
+                return array_values( array_filter( $schedule ) );
+        }
+
+        private function get_current_time() {
+                return new DateTimeImmutable( 'now', $this->get_site_timezone() );
+        }
+
+        private function normalize_schedule_entry( $entry ) {
+                if ( ! is_array( $entry ) ) {
+                        return null;
+                }
+
+                $channel = isset( $entry['channel'] ) ? intval( $entry['channel'] ) : 0;
+
+                $priority = isset( $entry['priority'] ) ? intval( $entry['priority'] ) : 0;
+
+                $date_start = isset( $entry['date_start'] ) ? sanitize_text_field( $entry['date_start'] ) : '';
+                $date_end   = isset( $entry['date_end'] ) ? sanitize_text_field( $entry['date_end'] ) : '';
+                $time_start = isset( $entry['time_start'] ) ? sanitize_text_field( $entry['time_start'] ) : '';
+                $time_end   = isset( $entry['time_end'] ) ? sanitize_text_field( $entry['time_end'] ) : '';
+
+                $days = array();
+                if ( isset( $entry['days'] ) ) {
+                        if ( is_array( $entry['days'] ) ) {
+                                $days = array_map( 'intval', $entry['days'] );
+                        } else {
+                                $days = array_map( 'intval', explode( ',', $entry['days'] ) );
+                        }
+                }
+
+                $days = array_values( array_intersect( range( 0, 6 ), $days ) );
+
+                return array(
+                        'channel'    => $channel,
+                        'priority'   => $priority,
+                        'date_start' => $date_start,
+                        'date_end'   => $date_end,
+                        'time_start' => $time_start,
+                        'time_end'   => $time_end,
+                        'days'       => $days,
+                );
+        }
+
+        private function is_schedule_active( $schedule, DateTimeImmutable $now ) {
+                $date_start = $this->create_date_from_string( $schedule['date_start'], 'start' );
+                $date_end   = $this->create_date_from_string( $schedule['date_end'], 'end' );
+
+                if ( $date_start && $now < $date_start ) {
+                        return false;
+                }
+
+                if ( $date_end && $now > $date_end ) {
+                        return false;
+                }
+
+                if ( ! empty( $schedule['days'] ) ) {
+                        $weekday = intval( $now->format( 'w' ) );
+                        if ( ! in_array( $weekday, $schedule['days'], true ) ) {
+                                return false;
+                        }
+                }
+
+                $time_start = $this->parse_time_to_seconds( $schedule['time_start'], 0 );
+                $time_end   = $this->parse_time_to_seconds( $schedule['time_end'], DAY_IN_SECONDS );
+
+                if ( $time_end <= $time_start ) {
+                        return false;
+                }
+
+                $current_seconds = intval( $now->format( 'H' ) ) * HOUR_IN_SECONDS + intval( $now->format( 'i' ) ) * MINUTE_IN_SECONDS;
+
+                return ( $current_seconds >= $time_start && $current_seconds < $time_end );
+        }
+
+        private function create_date_from_string( $date_string, $context = 'start' ) {
+                if ( empty( $date_string ) ) {
+                        return null;
+                }
+
+                $format = 'Y-m-d';
+                $timezone = $this->get_site_timezone();
+                $date = DateTimeImmutable::createFromFormat( $format, $date_string, $timezone );
+
+                if ( ! $date ) {
+                        return null;
+                }
+
+                if ( 'end' === $context ) {
+                        return $date->setTime( 23, 59, 59 );
+                }
+
+                return $date->setTime( 0, 0, 0 );
+        }
+
+        private function parse_time_to_seconds( $time_string, $default ) {
+                if ( empty( $time_string ) ) {
+                        return $default;
+                }
+
+                $date = DateTimeImmutable::createFromFormat( 'H:i', $time_string, $this->get_site_timezone() );
+
+                if ( ! $date ) {
+                        return $default;
+                }
+
+                return intval( $date->format( 'H' ) ) * HOUR_IN_SECONDS + intval( $date->format( 'i' ) ) * MINUTE_IN_SECONDS;
+        }
+
+        private function convert_timestamp_to_datetime( $timestamp ) {
+                if ( empty( $timestamp ) ) {
+                        return null;
+                }
+
+                try {
+                        $date = new DateTimeImmutable( '@' . intval( $timestamp ) );
+                } catch ( Exception $exception ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+                        return null;
+                }
+
+                return $date->setTimezone( $this->get_site_timezone() );
+        }
+
+        private function sort_channels_by_priority( $a, $b ) {
+                if ( $a['priority'] === $b['priority'] ) {
+                        return 0;
+                }
+
+                return ( $a['priority'] > $b['priority'] ) ? -1 : 1;
+        }
+
+        private function get_site_timezone() {
+                if ( function_exists( 'wp_timezone' ) ) {
+                        return wp_timezone();
+                }
+
+                $timezone_string = get_option( 'timezone_string' );
+
+                if ( ! empty( $timezone_string ) ) {
+                        try {
+                                return new DateTimeZone( $timezone_string );
+                        } catch ( Exception $exception ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+                                // Fallback to offset handling below.
+                        }
+                }
+
+                $offset  = floatval( get_option( 'gmt_offset', 0 ) );
+                $hours   = (int) $offset;
+                $minutes = abs( $offset - $hours ) * 60;
+                $sign    = ( $offset < 0 ) ? '-' : '+';
+                $timezone_offset = sprintf( '%s%02d:%02d', $sign, abs( $hours ), $minutes );
+
+                try {
+                        return new DateTimeZone( $timezone_offset );
+                } catch ( Exception $exception ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+                        return new DateTimeZone( 'UTC' );
+                }
+        }
 
 	/**
 	 * Checks if a reset is requested for this display.
