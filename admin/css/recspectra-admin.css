@@ -158,6 +158,15 @@ div[id^=recspectra_slide_background_] {
 .recspectra_slide_formats {
   border-bottom: 1px solid #eee;
 }
+
+.recspectra-channel-schedule-days .recspectra-channel-schedule-day {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.recspectra-channel-schedule-days .recspectra-channel-schedule-day:last-child {
+  margin-bottom: 0;
+}
 .recspectra_slide_admin_description {
   color: #72777c;
 }

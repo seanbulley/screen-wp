@@ -356,13 +356,13 @@ class Recspectra_Admin_Display {
                 $days       = isset( $rule['days'] ) && is_array( $rule['days'] ) ? array_map( 'intval', $rule['days'] ) : array();
 
                 $days_of_week = array(
-                        0 => esc_html__( 'Sunday', 'recspectra' ),
                         1 => esc_html__( 'Monday', 'recspectra' ),
                         2 => esc_html__( 'Tuesday', 'recspectra' ),
                         3 => esc_html__( 'Wednesday', 'recspectra' ),
                         4 => esc_html__( 'Thursday', 'recspectra' ),
                         5 => esc_html__( 'Friday', 'recspectra' ),
                         6 => esc_html__( 'Saturday', 'recspectra' ),
+                        0 => esc_html__( 'Sunday', 'recspectra' ),
                 );
 
                 ob_start();
@@ -402,7 +402,7 @@ class Recspectra_Admin_Display {
                         </td>
                         <td class="recspectra-channel-schedule-days">
                                 <?php foreach ( $days_of_week as $day_index => $day_label ) : ?>
-                                        <label>
+                                        <label class="recspectra-channel-schedule-day">
                                                 <input type="checkbox" value="<?php echo esc_attr( $day_index ); ?>" name="recspectra_channel_schedule[<?php echo esc_attr( $index_attr ); ?>][days][]" <?php checked( in_array( $day_index, $days, true ), true ); ?> />
                                                 <span><?php echo esc_html( $day_label ); ?></span>
                                         </label>
