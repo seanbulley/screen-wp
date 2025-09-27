@@ -5,7 +5,7 @@
  * @since	1.6.0
  */
 
-$slide = new Recspectra_Slide( get_the_id() );
+$slide = new VUWU_Slide( get_the_id() );
 
 $video_url = get_post_meta( $slide->ID, 'slide_bg_html5_video_video_url', true );
 $video_start = get_post_meta( $slide->ID, 'slide_bg_html5_video_video_start', true );
@@ -17,10 +17,10 @@ if ( ! empty( $video_url ) ) {
 
 	?><div<?php $slide->background_classes(); ?><?php $slide->background_data_attr();?>>
 		<div class="html5-video-container"
-			data-recspectra-video-start="<?php echo $video_start; ?>"
-			data-recspectra-video-end="<?php echo $video_end; ?>"
-			data-recspectra-hold-slide="<?php echo $hold_slide; ?>"
-			data-recspectra-output-sound="<?php echo $enable_sound; ?>"
+			data-vuwu-video-start="<?php echo $video_start; ?>"
+			data-vuwu-video-end="<?php echo $video_end; ?>"
+			data-vuwu-hold-slide="<?php echo $hold_slide; ?>"
+			data-vuwu-output-sound="<?php echo $enable_sound; ?>"
 		>
 			<video preload="auto" playsinline muted data-object-fit>
 				<source src="<?php echo $video_url; ?>">

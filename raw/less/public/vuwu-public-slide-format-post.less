@@ -1,0 +1,68 @@
+.vuwu-slide.vuwu-slide-post {
+
+	.inner {
+		display: flex;
+		width: 100%;
+		height: 100%;
+
+		figure,
+		.vuwu-slide-fields {
+			flex: 0 0 auto;
+			width: auto;
+			height: auto;
+		}
+
+		figure {
+			margin: 0;
+			img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover; // no IE support
+			}
+		}
+
+		.vuwu-slide-fields {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+
+			padding: 4vmin;
+
+			.vuwu-slide-field-title span,
+			.vuwu-slide-field-date span,
+			.vuwu-slide-field-content {
+				line-height: 1.5;
+				padding: 0.5rem 1rem;
+  				background-color: rgba(255,255,255, 0.8);
+				box-decoration-break: clone;
+			}
+			.vuwu-slide-field-date span {
+				line-height: 1.7;
+			}
+			.vuwu-slide-field-content {
+				padding: 1.5rem 1rem;
+			}
+		}
+
+		@media (min-aspect-ratio: 1/1) {
+			flex-direction: row;
+			.vuwu-slide-fields {
+				width: (100% * 2/3);
+			}
+			figure,
+			figure + .vuwu-slide-fields {
+				width: 50%;
+			}
+		}
+		@media (max-aspect-ratio: 1/1) {
+			flex-direction: column;
+			justify-content: flex-end;
+			figure,
+			figure + .vuwu-slide-fields {
+				height: 50%;
+			}
+			.vuwu-slide-fields {
+			}
+		}
+	}
+}

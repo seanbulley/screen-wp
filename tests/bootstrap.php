@@ -8,12 +8,12 @@ if ( ! $_tests_dir ) {
 require_once $_tests_dir . '/includes/functions.php';
 
 function _manually_load_plugin() {
-	require dirname( dirname( __FILE__ ) ) . '/recspectra.php';
+	require dirname( dirname( __FILE__ ) ) . '/vuwu.php';
 }
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 
 require $_tests_dir . '/includes/bootstrap.php';
 
-require_once( dirname( __FILE__ ) . '/includes/class-recspectra-unittestcase.php' );
-require_once( dirname( __FILE__ ) . '/includes/class-recspectra-theater-unittestcase.php' );
-require_once( dirname( __FILE__ ) . '/includes/class-recspectra-ajax-unittestcase.php' );
+require_once( dirname( __FILE__ ) . '/includes/class-vuwu-unittestcase.php' );
+require_once( dirname( __FILE__ ) . '/includes/class-vuwu-theater-unittestcase.php' );
+require_once( dirname( __FILE__ ) . '/includes/class-vuwu-ajax-unittestcase.php' );

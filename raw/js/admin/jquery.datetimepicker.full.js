@@ -1218,7 +1218,7 @@ var DateFormatter;
 	};
 
 	// for locale settings
-	$.recspectra_datetimepicker = {
+	$.vuwu_datetimepicker = {
 		setLocale: function(locale){
 			var newLocale = default_options.i18n[locale]?locale:globalLocaleDefault;
 			if(globalLocale != newLocale){
@@ -1431,7 +1431,7 @@ var DateFormatter;
 		});
 	};
 
-	$.fn.recspectra_datetimepicker = function (opt, opt2) {
+	$.fn.vuwu_datetimepicker = function (opt, opt2) {
 		var result = this,
 			KEY0 = 48,
 			KEY9 = 57,
@@ -2960,7 +2960,7 @@ var DateFormatter;
 		return result;
 	};
 
-	$.fn.recspectra_datetimepicker.defaults = default_options;
+	$.fn.vuwu_datetimepicker.defaults = default_options;
 
 	function HighlightedDate(date, desc, style) {
 		"use strict";
