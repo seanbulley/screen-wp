@@ -280,6 +280,7 @@
                 }
         }
 
+
         function getNextScheduleIndex( $container ) {
                 var maxIndex = -1;
 
@@ -328,14 +329,17 @@
 
                 $container.append( rowHtml );
 
+
                 var $row = $container.children( '.vuwu-channel-schedule-row' ).last();
                 updateScheduleSummary( $row );
+
         }
 
         function removeScheduleRow( event ) {
                 event.preventDefault();
 
                 var $row = $( event.currentTarget ).closest( '.vuwu-channel-schedule-row' );
+
                 var index = $row.attr( 'data-index' );
                 var $container = $row.closest( '.vuwu-channel-schedule-rows' );
                 var $summaryRow = $row.next( '.vuwu-channel-schedule-row-summary[data-index="' + index + '"]' );
@@ -343,6 +347,10 @@
                 if ( $summaryRow.length ) {
                         $summaryRow.remove();
                 }
+
+                $row.remove();
+
+                var $container = $row.closest( '.vuwu-channel-schedule-rows' );
 
                 $row.remove();
 
@@ -365,6 +373,10 @@
                         $container.children( '.vuwu-channel-schedule-row' ).each( function() {
                                 updateScheduleSummary( $( this ) );
                         } );
+
+        $( document ).ready( function() {
+                $( '.vuwu-channel-schedule-rows' ).each( function() {
+                        ensurePlaceholderRow( $( this ) );
                 } );
         } );
 })( jQuery );

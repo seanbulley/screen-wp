@@ -431,6 +431,7 @@ class VUWU_Admin_Display {
                                 </div>
                         </td>
                 </tr>
+
                 <?php
 
                 return ob_get_clean();
@@ -693,6 +694,7 @@ class VUWU_Admin_Display {
                 return date_i18n( $format, $timestamp );
         }
 
+
 	/**
 	 * Localizes the JavaScript for the display admin area.
 	 *
@@ -741,6 +743,7 @@ class VUWU_Admin_Display {
                 );
 
                 wp_localize_script( VUWU::get_plugin_name() . '-display-schedule', 'vuwu_channel_schedule_summary', $summary_strings );
+
         }
 
 	/**
