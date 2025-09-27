@@ -28,7 +28,7 @@ class VUWU_Admin_Channel {
 
 			if ( 'title' == $key ) {
 				// Add slides count column after the title column
-				$new_columns['slides_count'] = __( 'Number of slides', 'vuwu' );
+                            $new_columns['slides_count'] = __( 'Number of content items', 'vuwu' );
 			}
 		}
 		return $new_columns;
@@ -150,14 +150,14 @@ class VUWU_Admin_Channel {
 			<div class="vuwu_slides_editor_add">
 				<table class="form-table">
 					<tbody>
-						<th>
-							<label for="vuwu_slides_editor_add">
-								<?php echo esc_html__( 'Add slide', 'vuwu' ); ?>
-							</label>
-						</th>
+                                                <th>
+                                                        <label for="vuwu_slides_editor_add">
+                                                                <?php echo esc_html__( 'Add content', 'vuwu' ); ?>
+                                                        </label>
+                                                </th>
 						<td>
-							<select id="vuwu_slides_editor_add" class="vuwu_slides_editor_add_select">
-								<option value="">(<?php echo esc_html__( 'Select a slide', 'vuwu' ); ?>)</option>
+                                                        <select id="vuwu_slides_editor_add" class="vuwu_slides_editor_add_select" data-placeholder="<?php echo esc_attr__( 'Select content', 'vuwu' ); ?>">
+                                                                <option value="">(<?php echo esc_html__( 'Select content', 'vuwu' ); ?>)</option>
 								<?php
 									$slides = VUWU_Slides::get_posts();
 									foreach ( $slides as $slide ) {
@@ -370,7 +370,7 @@ class VUWU_Admin_Channel {
 
 					if ( empty( $slides ) ) {
 						?><p>
-							<?php echo esc_html__( 'No slides in this channel yet.', 'vuwu' ); ?>
+                                    <?php echo esc_html__( 'No content in this channel yet.', 'vuwu' ); ?>
 						</p><?php
 					}
 					else {
@@ -469,7 +469,7 @@ class VUWU_Admin_Channel {
                         return;
                 }
 
-                $defaults = array( 'confirm_remove_message' => esc_html__( 'Are you sure you want to remove this slide from the channel?', 'vuwu' ) );
+                $defaults = array( 'confirm_remove_message' => esc_html__( 'Are you sure you want to remove this content item from the channel?', 'vuwu' ) );
                 wp_localize_script( VUWU::get_plugin_name() . '-admin', 'vuwu_slides_editor_defaults', $defaults );
 
                 $security = array( 'nonce' => wp_create_nonce( 'vuwu_slides_editor_ajax_nonce' ) );
