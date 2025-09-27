@@ -104,8 +104,8 @@ class VUWU_Admin_Channel {
 	 */
 	static function add_slides_settings_meta_box() {
 		add_meta_box(
-			'vuwu_slides_settings',
-			__( 'Slideshow settings' , 'vuwu' ),
+                       'vuwu_slides_settings',
+                       __( 'Content settings' , 'vuwu' ),
 			array( __CLASS__, 'slides_settings_meta_box' ),
 			VUWU_Channel::post_type_name,
 			'normal',
@@ -407,7 +407,7 @@ class VUWU_Admin_Channel {
 										<?php } ?>
 									</div>
 									<div class="vuwu_slides_editor_slides_slide_caption">
-										<?php echo esc_html_x( 'Slide', 'slide cpt', 'vuwu' ) . ' ' . ( $i + 1 ); ?>
+                                                                                <?php echo esc_html_x( 'Content', 'slide cpt', 'vuwu' ) . ' ' . ( $i + 1 ); ?>
 										(<a href="#" class="vuwu_slides_editor_slides_slide_remove">x</a>)
 									</div>
 								</div>

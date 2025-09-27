@@ -65,15 +65,15 @@ class VUWU_Setup {
 
 		register_post_type( VUWU_Slide::post_type_name,
 			array(
-				'labels' => array(
+                               'labels' => array(
                                        'name' => _x( 'Content', 'slide cpt', 'vuwu' ),
-					'singular_name' => _x( 'Slide', 'slide cpt', 'vuwu' ),
-					'add_new' =>  _x( 'Add New', 'slide cpt', 'vuwu'),
-					'new_item' => _x( 'New slide', 'slide cpt', 'vuwu' ),
-					'view_item' => _x( 'View slide', 'slide cpt', 'vuwu' ),
-					'add_new_item' => _x( 'Add new slide', 'slide cpt', 'vuwu' ),
-					'edit_item' => _x( 'Edit slide', 'slide cpt', 'vuwu' ),
-				),
+                                       'singular_name' => _x( 'Content', 'slide cpt', 'vuwu' ),
+                                       'add_new' =>  _x( 'Add New', 'slide cpt', 'vuwu'),
+                                       'new_item' => _x( 'New content', 'slide cpt', 'vuwu' ),
+                                       'view_item' => _x( 'View content', 'slide cpt', 'vuwu' ),
+                                       'add_new_item' => _x( 'Add new content', 'slide cpt', 'vuwu' ),
+                                       'edit_item' => _x( 'Edit content', 'slide cpt', 'vuwu' ),
+                                ),
 				'public' => true,
 				'has_archive' => false,
 				'show_in_menu' => 'vuwu',

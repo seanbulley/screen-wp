@@ -24,7 +24,7 @@ class VUWU_Admin_Slide {
 	static function add_slide_editor_meta_boxes() {
 		add_meta_box(
 			'vuwu_slide_content',
-			__( 'Slide content' , 'vuwu' ),
+			__( 'Content details' , 'vuwu' ),
 			array( __CLASS__, 'slide_content_meta_box' ),
 			VUWU_Slide::post_type_name,
 			'normal',
@@ -33,11 +33,12 @@ class VUWU_Admin_Slide {
 	}
 
         /**
-         * Adds a Slide Format column to the Content admin table, just after the title column.
+         * Adds a Content Format column to the Content admin table, just after the title column.
          *
          * @since       1.0.0
          * @since       1.3.2   Changed method to static.
          * @since       1.5.1   Renamed column from 'Slide format' to 'Slide format, background'.
+	 *		Updated copy to refer to content instead of slides.
          *
          * @param       array   $columns        The current columns.
          * @return      array                           The new columns.
@@ -50,14 +51,14 @@ class VUWU_Admin_Slide {
 
 			if ( 'title' == $key ) {
 				// Add slides count column after the title column
-				$new_columns['slide_format'] = __( 'Slide format, background', 'vuwu' );
+				$new_columns['slide_format'] = __( 'Content format, background', 'vuwu' );
 			}
 		}
 		return $new_columns;
 	}
 
 	/**
-	 * Outputs the Slide Format column.
+	 * Outputs the Content Format column.
 	 *
 	 * @since	1.0.0
 	 * @since	1.3.2	Changed method to static.
