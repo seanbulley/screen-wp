@@ -367,6 +367,16 @@ class VUWU_Admin_Display {
 
                 ob_start();
 
+                $summary_text = self::get_schedule_summary_text(
+                        array(
+                                'date_start' => $date_start,
+                                'date_end'   => $date_end,
+                                'time_start' => $time_start,
+                                'time_end'   => $time_end,
+                                'days'       => $days,
+                        )
+                );
+
                 ?>
                 <tr class="vuwu-channel-schedule-row" data-index="<?php echo esc_attr( $index_attr ); ?>">
                         <td>
@@ -414,10 +424,276 @@ class VUWU_Admin_Display {
                                 </button>
                         </td>
                 </tr>
+                <tr class="vuwu-channel-schedule-row-summary" data-index="<?php echo esc_attr( $index_attr ); ?>">
+                        <td colspan="6">
+                                <div class="vuwu-channel-schedule-summary">
+                                        <?php echo esc_html( $summary_text ); ?>
+                                </div>
+                        </td>
+                </tr>
+
                 <?php
 
                 return ob_get_clean();
         }
+
+        /**
+         * Generates a human-friendly summary of the supplied schedule rule.
+         *
+         * @since 1.8.0
+         *
+         * @param array $rule Schedule rule values.
+         * @return string
+         */
+        private static function get_schedule_summary_text( array $rule ) {
+                $days_text = self::format_schedule_days( isset( $rule['days'] ) ? (array) $rule['days'] : array() );
+                $time_text = self::format_schedule_time_window(
+                        isset( $rule['time_start'] ) ? $rule['time_start'] : '',
+                        isset( $rule['time_end'] ) ? $rule['time_end'] : ''
+                );
+                $date_text = self::format_schedule_date_window(
+                        isset( $rule['date_start'] ) ? $rule['date_start'] : '',
+                        isset( $rule['date_end'] ) ? $rule['date_end'] : ''
+                );
+
+                $parts = array_filter( array( $days_text, $time_text, $date_text ) );
+
+                if ( empty( $parts ) ) {
+                        return esc_html__( 'No scheduling constraints.', 'vuwu' );
+                }
+
+                $sentence = trim( preg_replace( '/\s+/', ' ', implode( ' ', $parts ) ) );
+
+                if ( '' === $sentence ) {
+                        $sentence = esc_html__( 'No scheduling constraints.', 'vuwu' );
+                }
+
+                if ( '.' !== substr( $sentence, -1 ) ) {
+                        $sentence .= '.';
+                }
+
+                return $sentence;
+        }
+
+        /**
+         * Formats the days component of a schedule summary.
+         *
+         * @since 1.8.0
+         *
+         * @param array $days Selected days.
+         * @return string
+         */
+        private static function format_schedule_days( array $days ) {
+                $available_days = array( 1, 2, 3, 4, 5, 6, 0 );
+                $days           = array_values( array_unique( array_map( 'intval', $days ) ) );
+                sort( $days );
+
+                if ( empty( $days ) || count( array_intersect( $available_days, $days ) ) === count( $available_days ) ) {
+                        return esc_html__( 'Every day', 'vuwu' );
+                }
+
+                $labels = array(
+                        1 => esc_html__( 'Mondays', 'vuwu' ),
+                        2 => esc_html__( 'Tuesdays', 'vuwu' ),
+                        3 => esc_html__( 'Wednesdays', 'vuwu' ),
+                        4 => esc_html__( 'Thursdays', 'vuwu' ),
+                        5 => esc_html__( 'Fridays', 'vuwu' ),
+                        6 => esc_html__( 'Saturdays', 'vuwu' ),
+                        0 => esc_html__( 'Sundays', 'vuwu' ),
+                );
+
+                $ordered_labels = array();
+                foreach ( $available_days as $day ) {
+                        if ( in_array( $day, $days, true ) && isset( $labels[ $day ] ) ) {
+                                $ordered_labels[] = $labels[ $day ];
+                        }
+                }
+
+                if ( empty( $ordered_labels ) ) {
+                        return esc_html__( 'Every day', 'vuwu' );
+                }
+
+                return self::humanize_list( $ordered_labels );
+        }
+
+        /**
+         * Formats the time window component of a schedule summary.
+         *
+         * @since 1.8.0
+         *
+         * @param string $start Start time (H:i).
+         * @param string $end   End time (H:i).
+         * @return string
+         */
+        private static function format_schedule_time_window( $start, $end ) {
+                $start_formatted = self::format_time_value( $start );
+                $end_formatted   = self::format_time_value( $end );
+
+                if ( $start_formatted && $end_formatted ) {
+                        return ucfirst( sprintf( esc_html__( 'from %1$s to %2$s', 'vuwu' ), $start_formatted, $end_formatted ) );
+                }
+
+                if ( $start_formatted ) {
+                        return ucfirst( sprintf( esc_html__( 'from %s onward', 'vuwu' ), $start_formatted ) );
+                }
+
+                if ( $end_formatted ) {
+                        return ucfirst( sprintf( esc_html__( 'until %s', 'vuwu' ), $end_formatted ) );
+                }
+
+                return esc_html__( 'All Day', 'vuwu' );
+        }
+
+        /**
+         * Formats the date window component of a schedule summary.
+         *
+         * @since 1.8.0
+         *
+         * @param string $start Start date (Y-m-d).
+         * @param string $end   End date (Y-m-d).
+         * @return string
+         */
+        private static function format_schedule_date_window( $start, $end ) {
+                $start_timestamp = self::parse_date_value( $start );
+                $end_timestamp   = self::parse_date_value( $end );
+
+                if ( $start_timestamp && $end_timestamp ) {
+                        $start_formatted = self::format_date_value( $start_timestamp, $end_timestamp );
+                        $end_formatted   = self::format_date_value( $end_timestamp, $start_timestamp );
+
+                        return sprintf( esc_html__( 'between %1$s and %2$s', 'vuwu' ), $start_formatted, $end_formatted );
+                }
+
+                if ( $start_timestamp ) {
+                        return ucfirst( sprintf( esc_html__( 'starting %s', 'vuwu' ), self::format_date_value( $start_timestamp ) ) );
+                }
+
+                if ( $end_timestamp ) {
+                        return ucfirst( sprintf( esc_html__( 'until %s', 'vuwu' ), self::format_date_value( $end_timestamp ) ) );
+                }
+
+                return '';
+        }
+
+        /**
+         * Formats a list of strings into a human-friendly phrase.
+         *
+         * @since 1.8.0
+         *
+         * @param array $items Items to humanize.
+         * @return string
+         */
+        private static function humanize_list( array $items ) {
+                $items = array_values( array_filter( $items ) );
+                $count = count( $items );
+
+                if ( 0 === $count ) {
+                        return '';
+                }
+
+                if ( 1 === $count ) {
+                        return $items[0];
+                }
+
+                if ( 2 === $count ) {
+                        return sprintf( esc_html__( '%1$s and %2$s', 'vuwu' ), $items[0], $items[1] );
+                }
+
+                $last  = array_pop( $items );
+                $first = implode( esc_html__( ', ', 'vuwu' ), $items );
+
+                return sprintf( esc_html__( '%1$s, and %2$s', 'vuwu' ), $first, $last );
+        }
+
+        /**
+         * Formats a stored time for display within the schedule summary.
+         *
+         * @since 1.8.0
+         *
+         * @param string $value Time string in H:i format.
+         * @return string
+         */
+        private static function format_time_value( $value ) {
+                if ( empty( $value ) ) {
+                        return '';
+                }
+
+                $timezone = function_exists( 'wp_timezone' ) ? wp_timezone() : null;
+                $datetime = date_create_from_format( 'H:i', $value, $timezone );
+
+                if ( ! $datetime ) {
+                        return '';
+                }
+
+                return self::format_with_wp_date( get_option( 'time_format', 'g:i a' ), $datetime->getTimestamp() );
+        }
+
+        /**
+         * Parses a stored date string into a timestamp.
+         *
+         * @since 1.8.0
+         *
+         * @param string $value Date string in Y-m-d format.
+         * @return int|false
+         */
+        private static function parse_date_value( $value ) {
+                if ( empty( $value ) ) {
+                        return false;
+                }
+
+                $timezone = function_exists( 'wp_timezone' ) ? wp_timezone() : null;
+                $datetime = date_create_from_format( '!Y-m-d', $value, $timezone );
+
+                if ( ! $datetime ) {
+                        return false;
+                }
+
+                return $datetime->getTimestamp();
+        }
+
+        /**
+         * Formats a timestamp into a friendly date for the schedule summary.
+         *
+         * @since 1.8.0
+         *
+         * @param int      $timestamp           Timestamp to format.
+         * @param int|bool $comparison_timestamp Optional comparison timestamp to determine whether a year should be displayed.
+         * @return string
+         */
+        private static function format_date_value( $timestamp, $comparison_timestamp = false ) {
+                if ( ! $timestamp ) {
+                        return '';
+                }
+
+                $format       = 'jS F';
+                $current_year = intval( self::format_with_wp_date( 'Y', time() ) );
+                $year         = intval( self::format_with_wp_date( 'Y', $timestamp ) );
+                $compare_year = $comparison_timestamp ? intval( self::format_with_wp_date( 'Y', $comparison_timestamp ) ) : $year;
+
+                if ( $year !== $current_year || ( $comparison_timestamp && $year !== $compare_year ) ) {
+                        $format .= ' Y';
+                }
+
+                return self::format_with_wp_date( $format, $timestamp );
+        }
+
+        /**
+         * Formats a timestamp using wp_date when available, falling back to date_i18n.
+         *
+         * @since 1.8.0
+         *
+         * @param string $format    Date format string.
+         * @param int    $timestamp Timestamp to format.
+         * @return string
+         */
+        private static function format_with_wp_date( $format, $timestamp ) {
+                if ( function_exists( 'wp_date' ) ) {
+                        return wp_date( $format, $timestamp );
+                }
+
+                return date_i18n( $format, $timestamp );
+        }
+
 
 	/**
 	 * Localizes the JavaScript for the display admin area.
@@ -436,6 +712,38 @@ class VUWU_Admin_Display {
 
                 $channel_scheduler_defaults = self::get_channel_scheduler_defaults();
                 wp_localize_script( VUWU::get_plugin_name() . '-admin', 'vuwu_channel_scheduler_defaults', $channel_scheduler_defaults );
+
+                $summary_strings = array(
+                        'days'      => array(
+                                1 => esc_html__( 'Mondays', 'vuwu' ),
+                                2 => esc_html__( 'Tuesdays', 'vuwu' ),
+                                3 => esc_html__( 'Wednesdays', 'vuwu' ),
+                                4 => esc_html__( 'Thursdays', 'vuwu' ),
+                                5 => esc_html__( 'Fridays', 'vuwu' ),
+                                6 => esc_html__( 'Saturdays', 'vuwu' ),
+                                0 => esc_html__( 'Sundays', 'vuwu' ),
+                        ),
+                        'every_day' => esc_html__( 'Every day', 'vuwu' ),
+                        'list'      => array(
+                                'two'    => esc_html__( '%1$s and %2$s', 'vuwu' ),
+                                'serial' => esc_html__( '%1$s, and %2$s', 'vuwu' ),
+                                'join'   => esc_html__( ', ', 'vuwu' ),
+                        ),
+                        'time'      => array(
+                                'all_day' => esc_html__( 'All Day', 'vuwu' ),
+                                'from_to' => esc_html__( 'from %1$s to %2$s', 'vuwu' ),
+                                'from'    => esc_html__( 'from %s onward', 'vuwu' ),
+                                'until'   => esc_html__( 'until %s', 'vuwu' ),
+                        ),
+                        'dates'     => array(
+                                'between' => esc_html__( 'between %1$s and %2$s', 'vuwu' ),
+                                'starting' => esc_html__( 'starting %s', 'vuwu' ),
+                                'until'   => esc_html__( 'until %s', 'vuwu' ),
+                        ),
+                );
+
+                wp_localize_script( VUWU::get_plugin_name() . '-display-schedule', 'vuwu_channel_schedule_summary', $summary_strings );
+
         }
 
 	/**

@@ -167,6 +167,24 @@ div[id^=vuwu_slide_background_] {
 .vuwu-channel-schedule-days .vuwu-channel-schedule-day:last-child {
   margin-bottom: 0;
 }
+
+.vuwu-channel-schedule-row-summary td {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.vuwu-channel-schedule-summary {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  padding: 12px 16px;
+  background: #f0f6ff;
+  border-left: 4px solid #2271b1;
+  border-radius: 3px;
+  color: #1d2327;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 .vuwu_slide_admin_description {
   color: #72777c;
 }
