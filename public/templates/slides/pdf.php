@@ -5,13 +5,13 @@
  * @since	1.1.0
  */
 
-$slide = new Recspectra_Slide( get_the_id() );
+$slide = new VUWU_Slide( get_the_id() );
 
 $slide_pdf_file = get_post_meta( get_the_id(), 'slide_pdf_file', true );
 if ( ! empty( $slide_pdf_file ) ) {
 	// PDF file exists
 
-	$slide_images = get_post_meta( $slide_pdf_file, '_recspectra_pdf_images', true );
+	$slide_images = get_post_meta( $slide_pdf_file, '_vuwu_pdf_images', true );
 	if ( ! empty( $slide_images ) ) {
 		// PDF page images were generated
 

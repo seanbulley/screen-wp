@@ -7,7 +7,7 @@
  *					as this failed when page caching was enabled. Fixes issue #15.
  */
 
-$slide = new Recspectra_Slide( get_the_id() );
+$slide = new VUWU_Slide( get_the_id() );
 
 $video_url = get_post_meta( $slide->ID, 'slide_bg_video_video_url', true );
 $video_start = get_post_meta( $slide->ID, 'slide_bg_video_video_start', true );
@@ -23,11 +23,11 @@ if ( ! empty( $video_id ) ) {
 
 	?><div<?php $slide->background_classes(); ?><?php $slide->background_data_attr();?>>
 		<div class="youtube-video-container"
-			data-recspectra-video-id="<?php echo $video_id; ?>"
-			data-recspectra-video-start="<?php echo $video_start; ?>"
-			data-recspectra-video-end="<?php echo $video_end; ?>"
-			data-recspectra-hold-slide="<?php echo $hold_slide; ?>"
-			data-recspectra-output-sound="<?php echo $enable_sound; ?>"
+			data-vuwu-video-id="<?php echo $video_id; ?>"
+			data-vuwu-video-start="<?php echo $video_start; ?>"
+			data-vuwu-video-end="<?php echo $video_end; ?>"
+			data-vuwu-hold-slide="<?php echo $hold_slide; ?>"
+			data-vuwu-output-sound="<?php echo $enable_sound; ?>"
 		></div>
 	</div><?php
 

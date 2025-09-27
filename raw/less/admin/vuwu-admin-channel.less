@@ -1,0 +1,85 @@
+body.post-php.post-type-vuwu_channel {
+	#edit-slug-box {
+		display: none;
+	}
+}
+
+.vuwu_slides_editor_slides {
+
+	margin-bottom: 2em;
+
+	> div {
+		display: inline-block;
+	}
+
+	.vuwu_slides_editor_slides_slide {
+		display: inline-block;
+		margin: 1em;
+		margin-left: 0;
+		cursor: move;
+
+		.vuwu_slides_editor_slides_slide_iframe_container {
+			border: 1px solid @slides-editor-slide-border-color;
+			background-color: @slides-editor-slide-bg-color;
+			width: 108px;
+			height: 192px;
+			position: relative;
+
+
+			iframe {
+				width: 1080px;
+				height: 1920px;
+				transform: scale(0.1, 0.1);
+				transform-origin: top left;
+				pointer-events: none;
+			}
+
+			.vuwu_slides_editor_slides_slide_iframe_container_overlay {
+				display: none;
+				position: absolute;
+				top: 0; bottom: 0;
+				left: 0; right: 0;
+				z-index: 10;
+				background-color: @slides-editor-slide-bg-color;
+				padding: 0.5em;
+				overflow: hidden;
+
+				h4,
+				dl {
+					margin: 0 0 0.5em 0;
+				}
+				dl {
+					dt,
+					dd {
+						margin: 0;
+					}
+					dt {
+						color: @wp-form-alt-txt-color;
+					}
+				}
+			}
+
+			&:hover {
+				.vuwu_slides_editor_slides_slide_iframe_container_overlay {
+					display: block;
+				}
+			}
+		}
+
+		.vuwu_slides_editor_slides_slide_caption {
+			margin-top: 1em;
+			text-align: center;
+		}
+
+		&.vuwu-slide-is-stack {
+			.vuwu_slides_editor_slides_slide_iframe_container {
+				box-shadow: 3px 3px 0 0 @slides-editor-slide-shadow-bg-color, 3px 3px 0 1px @slides-editor-slide-shadow-border-color, 7px 7px 0 0 @slides-editor-slide-shadow-shadow-bg-color, 7px 7px 0 1px @slides-editor-slide-shadow-border-color;
+			}
+		}
+	}
+}
+
+.vuwu_slides_editor_add {
+	border-top: 1px solid @wp-form-hr-color;
+}
+
